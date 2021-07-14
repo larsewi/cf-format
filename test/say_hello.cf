@@ -1,0 +1,6 @@
+# A bundle that prints hello
+bundle agent say_hello(name) {
+    reports:
+        any::
+            "Hello $(name)!";
+}
