@@ -1,4 +1,5 @@
 import argparse
+from cf_policy import CFPolicy
 from error import exit_success
 from lexer import Lexer
 
@@ -7,11 +8,11 @@ def main():
     config = parse_arguments()
 
     for filename in config.file:
-        tokens = Lexer.tokenize_file(filename)
-        if config.debug == "lexer":
-            for token in tokens:
-                print(token)
-            exit_success()
+        lexer = Lexer(filename, config.debug == "lexer")
+        tokens = lexer.tokenize()
+
+        policy = CFPolicy.parse(tokens)
+        policy.pretty_print()
 
 
 def parse_arguments():
