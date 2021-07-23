@@ -12,7 +12,7 @@ class CFSyntax(ABC):
         self._nonterms = []
 
     @abstractmethod
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass
 
     def enter_parser(self):

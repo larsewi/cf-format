@@ -19,7 +19,7 @@ class CFComment(CFSyntax):
         comment.leave_parser()
         return comment
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass
 
     @staticmethod

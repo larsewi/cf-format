@@ -66,5 +66,5 @@ class CFBundleStatement(CFSyntax):
         bundlestatement.leave_parser()
         return bundlestatement
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass

@@ -19,5 +19,5 @@ class CFClassGuard(CFSyntax):
         classguard.leave_parser()
         return classguard
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass

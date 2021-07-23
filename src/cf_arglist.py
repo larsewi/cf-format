@@ -39,5 +39,5 @@ class CFArgList(CFSyntax):
         arglist.leave_parser()
         return arglist
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass

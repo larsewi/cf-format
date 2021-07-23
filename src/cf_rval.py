@@ -34,5 +34,5 @@ class CFRval(CFSyntax):
         rval.leave_parser()
         return rval
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass

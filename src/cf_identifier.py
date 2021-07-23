@@ -19,5 +19,5 @@ class CFIdentifier(CFSyntax):
         identifier.leave_parser()
         return identifier
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass

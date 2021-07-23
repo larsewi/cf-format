@@ -41,5 +41,5 @@ class CFPolicy(CFSyntax):
         policy.leave_parser()
         return policy
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass

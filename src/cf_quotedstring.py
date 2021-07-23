@@ -19,5 +19,5 @@ class CFQuotedString(CFSyntax):
         qstring.leave_parser()
         return qstring
 
-    def pretty_print(self):
+    def pretty_print(self, file):
         pass
