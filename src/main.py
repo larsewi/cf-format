@@ -1,5 +1,7 @@
 import argparse
+import sys
 from cf_policy import CFPolicy
+from error import exit_success
 from lexer import Lexer
 
 
@@ -11,7 +13,13 @@ def main():
         tokens = lexer.tokenize()
 
         policy = CFPolicy.parse(tokens, config.debug == "parser")
-        policy.pretty_print()
+
+        if config.debug == "print":
+            policy.pretty_print(sys.stdout)
+        else:
+            continue
+            with open(filename, 'w') as file:
+                policy.pretty_print(file)
 
 
 def parse_arguments():
@@ -22,7 +30,7 @@ def parse_arguments():
     arg_parser.add_argument(
         "-d",
         "--debug",
-        choices=["lexer", "parser"],
+        choices=["lexer", "parser", "print"],
         help="enable debug mode (intended for developers)",
     )
     arg_parser.add_argument("file", help="path to input files", type=str, nargs="*")
