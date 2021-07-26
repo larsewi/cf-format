@@ -67,14 +67,12 @@ Value   : '{self._value}'\n"
 
 class TokenList(list):
     def next(self):
-        if not self:
-            panic("Attempted to access empty token queue")
+        assert self, "Attempted to access empty token queue"
         self.pop(0)
         return self.current()
 
     def current(self):
-        if not self:
-            panic("Attempted to access empty token queue")
+        assert self, "Attempted to access empty token queue"
         return self[0]
 
     def skip(self, expected):

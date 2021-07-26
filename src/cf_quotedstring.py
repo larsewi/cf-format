@@ -4,7 +4,7 @@ from token import TokenKind
 
 class CFQuotedString(CFSyntax):
     def __init__(self, debug):
-        super().__init__("qstring", debug)
+        super().__init__("quotedstring", debug)
         self._value = None
 
     @staticmethod
@@ -19,5 +19,5 @@ class CFQuotedString(CFSyntax):
         qstring.leave_parser()
         return qstring
 
-    def pretty_print(self, file):
-        pass
+    def pretty_print(self, cursor=0):
+        return ""

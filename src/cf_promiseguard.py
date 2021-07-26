@@ -19,5 +19,5 @@ class CFPromiseGuard(CFSyntax):
         promiseguard.leave_parser()
         return promiseguard
 
-    def pretty_print(self, file):
-        pass
+    def pretty_print(self, cursor=0):
+        return ""

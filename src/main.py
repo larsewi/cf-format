@@ -11,15 +11,14 @@ def main():
     for filename in config.file:
         lexer = Lexer(filename, config.debug == "lexer")
         tokens = lexer.tokenize()
-
         policy = CFPolicy.parse(tokens, config.debug == "parser")
 
-        if config.debug == "print":
-            policy.pretty_print(sys.stdout)
-        else:
-            continue
-            with open(filename, 'w') as file:
-                policy.pretty_print(file)
+        buffer = policy.pretty_print()
+        # TODO: Open file in a safer manner
+        assert config.debug == "print", "You sure about this?"
+        file = sys.stdout if config.debug == "print" else open(filename, 'w')
+        file.write(buffer)
+        file.close()
 
 
 def parse_arguments():

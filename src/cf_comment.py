@@ -19,8 +19,8 @@ class CFComment(CFSyntax):
         comment.leave_parser()
         return comment
 
-    def pretty_print(self, file):
-        pass
+    def pretty_print(self, cursor=0):
+        return self._value
 
     @staticmethod
     def parse_while(it, tokens, debug):

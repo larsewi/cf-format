@@ -16,8 +16,6 @@ class CFPolicy(CFSyntax):
         policy.enter_parser()
 
         while tokens:
-            CFComment.parse_while(policy, tokens, debug)
-
             kind = tokens.current().kind()
             nonterm = None
             if kind is TokenKind.BUNDLE:
@@ -26,6 +24,8 @@ class CFPolicy(CFSyntax):
                 nonterm = CFBody.parse(tokens, debug)
             elif kind is TokenKind.PROMISE:
                 nonterm = CFPromise.parse(tokens, debug)
+            elif kind is TokenKind.COMMENT:
+                nonterm = CFComment.parse(tokens, debug)
             else:
                 policy.parser_error(
                     tokens.current(),
@@ -41,5 +41,10 @@ class CFPolicy(CFSyntax):
         policy.leave_parser()
         return policy
 
-    def pretty_print(self, file):
-        pass
+    def pretty_print(self, cursor=0):
+        buf = ""
+        for nonterm in self._nonterms:
+            buf += nonterm.pretty_print() + "\n"
+            if isinstance(nonterm, CFComment):
+                buf += "\n"
+        return buf

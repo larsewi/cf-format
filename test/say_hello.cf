@@ -1,7 +1,0 @@
-# A policy to say hello
-bundle agent main(name)
-{
-    reports:
-        any::
-            "Hello $(name)!";
-}

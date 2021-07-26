@@ -5,6 +5,7 @@ from token import TokenKind
 
 class CFSyntax(ABC):
     _indent = 0
+    _WRAP_LENGTH = 80
 
     def __init__(self, name, debug):
         self._name = name
@@ -12,19 +13,25 @@ class CFSyntax(ABC):
         self._nonterms = []
 
     @abstractmethod
-    def pretty_print(self, file):
+    def pretty_print(self, cursor=0) -> str:
         pass
 
     def enter_parser(self):
         if self._debug:
             print(" " * CFSyntax._indent + f"<{self._name}>")
-            CFSyntax._indent += 2
+            self.indent()
 
     def leave_parser(self):
         if self._debug:
-            assert CFSyntax._indent >= 2
-            CFSyntax._indent -= 2
+            self.dedent()
             print(" " * CFSyntax._indent + f"</{self._name}>")
+
+    def indent(self):
+        CFSyntax._indent += 2
+    
+    def dedent(self):
+        assert CFSyntax._indent >= 2
+        CFSyntax._indent -= 2
 
     def parser_error(self, found, *expected):
         eprint(

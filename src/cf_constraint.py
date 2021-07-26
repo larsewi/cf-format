@@ -26,5 +26,5 @@ class CFConstraint(CFSyntax):
         constraint.leave_parser()
         return constraint
 
-    def pretty_print(self, file):
-        pass
+    def pretty_print(self, cursor=0):
+        return ""

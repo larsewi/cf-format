@@ -31,5 +31,5 @@ class CFBundleBody(CFSyntax):
         bundlebody.leave_parser()
         return bundlebody
 
-    def pretty_print(self, file):
-        pass
+    def pretty_print(self, cursor=0):
+        return ""

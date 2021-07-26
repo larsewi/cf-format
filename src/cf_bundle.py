@@ -1,3 +1,4 @@
+from os import initgroups
 from cf_arglist import CFArgList
 from cf_bundlebody import CFBundleBody
 from cf_comment import CFComment
@@ -55,5 +56,51 @@ class CFBundle(CFSyntax):
         bundle.leave_parser()
         return bundle
 
-    def pretty_print(self, file):
-        pass
+    def pretty_print(self, cursor=0):
+        nonterms = self._nonterms
+        s = "bundle "
+        cursor += len(s)
+        buf = s
+
+        while isinstance(nonterms[0], CFComment):
+            comment = nonterms.pop(0)
+            buf += comment.pretty_print() + "\n"
+            cursor = 0
+        
+        bundletype = nonterms.pop(0)
+        assert isinstance(bundletype, CFIdentifier)
+        s = bundletype.pretty_print() + " "
+        cursor += len(s)
+        buf += s
+
+        while isinstance(nonterms[0], CFComment):
+            comment = nonterms.pop(0)
+            buf += comment.pretty_print() + "\n"
+            cursor = 0
+
+        bundleid = nonterms.pop(0)
+        assert isinstance(bundleid, CFIdentifier)
+        s = bundleid.pretty_print()
+        cursor += len(s)
+        buf += s
+
+        while isinstance(nonterms[0], CFComment):
+            comment = nonterms.pop(0)
+            buf += comment.pretty_print() + "\n"
+            cursor = 0
+
+        if isinstance(nonterms[0], CFArgList):
+            arglist = nonterms.pop(0)
+            buf += arglist.pretty_print(cursor) + "\n"
+            cursor = 0
+
+        while isinstance(nonterms[0], CFComment):
+            comment = nonterms.pop(0)
+            buf += comment.pretty_print() + "\n"
+            cursor = 0
+
+        bundlebody = nonterms.pop(0)
+        assert isinstance(bundlebody, CFBundleBody)
+        buf += bundlebody.pretty_print()
+
+        return buf
