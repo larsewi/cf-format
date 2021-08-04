@@ -1,8 +1,7 @@
 import re
 
-from error import eprint, exit_failure, exit_success
-from token import Token
-from token_kind import TokenKind
+from error import eprint, exit_failure
+from token import Token, TokenKind, TokenList
 
 
 class Lexer:
@@ -23,22 +22,17 @@ class Lexer:
             if file is not None:
                 file.close()
 
-        tokens = []
+        tokens = TokenList()
         lines = contents.splitlines()
         line_no = 0
         for line in lines:
             line_no += 1
             tokens += self._tokenize_line(line, line_no)
 
-        token = Token(TokenKind.EOF, "EoF", self._filename, line, line_no, len(lines[len(lines) - 1]))
-        if self._debug:
-            print(token)
-        tokens.append(token)
-
         return tokens
 
     def _tokenize_line(self, line, line_no):
-        tokens = []
+        tokens = TokenList()
         i = 0
         j = len(line)
 
@@ -46,11 +40,10 @@ class Lexer:
             for kind in TokenKind:
                 if re.fullmatch(kind.value, line[i:j]):
                     token = Token(kind, line[i:j], self._filename, line, line_no, i)
-                    if kind != TokenKind.WHITESPACE: # ignore whitespace tokens
+                    if kind != TokenKind.WHITESPACE:  # ignore whitespace tokens
                         tokens.append(token)
                         if self._debug:
                             print(token)
-
                     i = j
                     j = len(line) + 1
                     break
@@ -62,9 +55,11 @@ class Lexer:
         return tokens
 
     def lexer_error(self, line_no, column, line):
-        eprint(f"There are syntax errors in policy file '{self._filename}:{line_no}':")
+        eprint(
+            f"There are syntax errors in policy file '{self._filename}' on line {line_no}:"
+        )
         eprint(line)
         eprint(" " * column + "^ Unrecognized token")
-        eprint("\nFor more information use the following command:")
-        eprint(f"\tcf-promises {self._filename}")
+        eprint("\nFor more information run:")
+        eprint(f"\tcf-promises '{self._filename}'")
         exit_failure()

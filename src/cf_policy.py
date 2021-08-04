@@ -1,4 +1,4 @@
-from token_kind import TokenKind
+from token import TokenKind
 from cf_syntax import CFSyntax
 from cf_comment import CFComment
 from cf_bundle import CFBundle
@@ -7,38 +7,44 @@ from cf_promise import CFPromise
 
 
 class CFPolicy(CFSyntax):
-    def __init__(self):
-        super().__init__()
-        self._non_terms = []
+    def __init__(self, debug):
+        super().__init__("policy", debug)
 
     @staticmethod
-    def parse(tokens) -> CFSyntax:
-        policy = CFPolicy()
-        policy.enter_parser("policy")
+    def parse(tokens, debug) -> CFSyntax:
+        policy = CFPolicy(debug)
+        policy.enter_parser()
 
-        cur = policy.cur_token(tokens)
-        while True:
-            kind = cur.kind()
-            non_term = None
-            if kind == TokenKind.COMMENT:
-                non_term = CFComment.parse(tokens)
-            elif kind == TokenKind.BUNDLE:
-                non_term = CFBundle.parse(tokens)
-            elif kind == TokenKind.BODY:
-                non_term = CFBody.parse(tokens)
-            elif kind == TokenKind.PROMISE:
-                non_term = CFPromise.parse(tokens)
-            elif kind == TokenKind.EOF:
-                break
+        while tokens:
+            kind = tokens.current().kind()
+            nonterm = None
+            if kind is TokenKind.BUNDLE:
+                nonterm = CFBundle.parse(tokens, debug)
+            elif kind is TokenKind.BODY:
+                nonterm = CFBody.parse(tokens, debug)
+            elif kind is TokenKind.PROMISE:
+                nonterm = CFPromise.parse(tokens, debug)
+            elif kind is TokenKind.COMMENT:
+                nonterm = CFComment.parse(tokens, debug)
             else:
-                policy.parser_error(cur, TokenKind.COMMENT, TokenKind.BUNDLE, TokenKind.BODY, TokenKind.PROMISE, TokenKind.EOF)
-            
-            assert non_term != None
-            policy._non_terms.append(non_term)
-            cur = policy.next_token(tokens)
+                policy.parser_error(
+                    tokens.current(),
+                    TokenKind.COMMENT,
+                    TokenKind.BUNDLE,
+                    TokenKind.BODY,
+                    TokenKind.PROMISE,
+                )
 
-        policy.leave_parser("policy")
+            assert nonterm != None
+            policy._nonterms.append(nonterm)
+
+        policy.leave_parser()
         return policy
 
-    def pretty_print(self):
-        pass
+    def pretty_print(self, cursor=0):
+        buf = ""
+        for nonterm in self._nonterms:
+            buf += nonterm.pretty_print() + "\n"
+            if isinstance(nonterm, CFComment):
+                buf += "\n"
+        return buf

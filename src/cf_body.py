@@ -2,18 +2,18 @@ from cf_syntax import CFSyntax
 
 
 class CFBody(CFSyntax):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, debug):
+        super().__init__("body", debug)
 
     @staticmethod
-    def parse(tokens) -> CFSyntax:
-        body = CFBody()
-        body.enter_parser("body")
+    def parse(tokens, debug) -> CFSyntax:
+        body = CFBody(debug)
+        body.enter_parser()
 
         # TODO parse comment
 
-        body.leave_parser("body")
+        body.leave_parser()
         return body
 
-    def pretty_print(self):
-        pass
+    def pretty_print(self, cursor=0):
+        return ""

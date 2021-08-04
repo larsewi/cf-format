@@ -1,19 +1,23 @@
 from cf_syntax import CFSyntax
+from token import TokenKind
 
 
 class CFPromise(CFSyntax):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, debug):
+        super().__init__("promise", debug)
+        self._value = None
 
     @staticmethod
-    def parse(tokens) -> CFSyntax:
-        promise = CFPromise()
-        promise.enter_parser("promise")
+    def parse(tokens, debug) -> CFSyntax:
+        promise = CFPromise(debug)
+        promise.enter_parser()
 
-        # TODO parse comment
+        current = tokens.skip(TokenKind.QSTRING)
+        promise._value = current.value()
+        assert isinstance(promise._value, str)
 
-        promise.leave_parser("promise")
+        promise.leave_parser()
         return promise
 
-    def pretty_print(self):
-        pass
+    def pretty_print(self, cursor=0):
+        return ""

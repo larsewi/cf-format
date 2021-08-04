@@ -1,0 +1,13 @@
+bundle
+agent
+main
+
+{
+    vars:
+        "filename" 
+            string => '/tmp/myfile.txt';
+    files:
+        `$(filename)`
+            create => "true",
+            content => format("%s", "Hello World!");
+}
