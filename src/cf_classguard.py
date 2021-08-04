@@ -20,4 +20,4 @@ class CFClassGuard(CFSyntax):
         return classguard
 
     def pretty_print(self, cursor=0):
-        return ""
+        return self._value

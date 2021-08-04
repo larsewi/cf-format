@@ -15,43 +15,60 @@ class CFBundle(CFSyntax):
     def parse(tokens, debug) -> CFSyntax:
         bundle = CFBundle(debug)
         bundle.enter_parser()
+        nonterms = bundle._nonterms
 
         tokens.skip(TokenKind.BUNDLE)
 
-        CFComment.parse_while(bundle, tokens, debug)
+        # Parse comments if any
+        while tokens.current().kind() is TokenKind.COMMENT:
+            comment = CFComment.parse(tokens, debug)
+            assert comment is not None
+            nonterms.append(comment)
 
+        # Parse bundletype
         current = tokens.current()
         if current.kind() is not TokenKind.IDENTIFIER:
             bundle.parser_error(current, TokenKind.IDENTIFIER)
         bundletype = CFIdentifier.parse(tokens, debug)
         assert bundletype is not None
-        bundle._nonterms.append(bundletype)
+        nonterms.append(bundletype)
 
-        CFComment.parse_while(bundle, tokens, debug)
+        # Parse comments if any
+        while tokens.current().kind() is TokenKind.COMMENT:
+            comment = CFComment.parse(tokens, debug)
+            assert comment is not None
+            nonterms.append(comment)
 
+        # Parse bundleid
         current = tokens.current()
         if current.kind() is not TokenKind.IDENTIFIER:
             bundle.parser_error(current, TokenKind.IDENTIFIER)
         bundleid = CFIdentifier.parse(tokens, debug)
         assert bundleid is not None
-        bundle._nonterms.append(bundleid)
+        nonterms.append(bundleid)
 
-        CFComment.parse_while(bundle, tokens, debug)
+        # Parse comments if any
+        while tokens.current().kind() is TokenKind.COMMENT:
+            comment = CFComment.parse(tokens, debug)
+            assert comment is not None
+            nonterms.append(comment)
 
-        current = tokens.current()
-        if current.kind() is TokenKind.LEFT_PAR:
+        # Parse arglist
+        if tokens.current().kind() is TokenKind.LEFT_PAR:
             arglist = CFArgList.parse(tokens, debug)
             assert arglist is not None
-            bundle._nonterms.append(arglist)
+            nonterms.append(arglist)
 
-        CFComment.parse_while(bundle, tokens, debug)
+        # Parse comments if any
+        while tokens.current().kind() is TokenKind.COMMENT:
+            comment = CFComment.parse(tokens, debug)
+            assert comment is not None
+            nonterms.append(comment)
 
-        current = tokens.current()
-        if current.kind() is not TokenKind.LEFT_BRACE:
-            bundle.parser_error(current, TokenKind.IDENTIFIER)
+        # Parse bundlebody
         bundlebody = CFBundleBody.parse(tokens, debug)
         assert bundlebody is not None
-        bundle._nonterms.append(bundlebody)
+        nonterms.append(bundlebody)
 
         bundle.leave_parser()
         return bundle
