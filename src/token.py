@@ -1,6 +1,5 @@
 from enum import Enum
 from re import compile
-from error import panic
 
 
 class TokenKind(Enum):

@@ -1,4 +1,3 @@
-from os import write
 from cf_comment import CFComment
 from cf_identifier import CFIdentifier
 from cf_syntax import CFSyntax

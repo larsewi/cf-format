@@ -1,4 +1,3 @@
-from os import initgroups
 from cf_arglist import CFArgList
 from cf_bundlebody import CFBundleBody
 from cf_comment import CFComment

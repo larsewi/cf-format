@@ -1,6 +1,6 @@
 from cf_identifier import CFIdentifier
 from cf_syntax import CFSyntax
-from token import Token, TokenKind
+from token import TokenKind
 
 
 class CFConstraint(CFSyntax):

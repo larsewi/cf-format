@@ -1,7 +1,6 @@
 import argparse
 import sys
 from cf_policy import CFPolicy
-from error import exit_success
 from lexer import Lexer
 
 
