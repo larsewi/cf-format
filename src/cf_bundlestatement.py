@@ -23,7 +23,11 @@ class CFBundleStatement(CFSyntax):
         assert promiseguard is not None
         nonterms.append(promiseguard)
 
-        while tokens.current().kind() in (TokenKind.CLASS_GUARD, TokenKind.QUOTED_STRING, TokenKind.COMMENT):
+        while tokens.current().kind() in (
+            TokenKind.CLASS_GUARD,
+            TokenKind.QUOTED_STRING,
+            TokenKind.COMMENT,
+        ):
             if tokens.current().kind() is TokenKind.COMMENT:
                 # Parse comment
                 comment = CFComment.parse(tokens, debug)
@@ -59,5 +63,5 @@ class CFBundleStatement(CFSyntax):
 
             assert isinstance(nonterm, CFPromiseLine)
             buf += nonterm.pretty_print()
-            
+
         return buf

@@ -23,4 +23,4 @@ class TokenKind(Enum):
     CLASS = compile(r"[.|&!()a-zA-Z0-9_\200-\377:][\t .|&!()a-zA-Z0-9_\200-\377:]*::")
     VARCLASS = compile(r"(\"[^\"\0]*\"|\'[^\'\0]*\')::")
     PROMISE_GUARD = compile(r"[a-zA-Z_]+:")
-    EOF = compile(r"\b\B") # Does not match anything
+    EOF = compile(r"\b\B")  # Does not match anything

@@ -82,7 +82,7 @@ class CFBundle(CFSyntax):
             comment = nonterms.pop(0)
             buf += comment.pretty_print() + "\n"
             cursor = 0
-        
+
         bundletype = nonterms.pop(0)
         assert isinstance(bundletype, CFIdentifier)
         s = bundletype.pretty_print() + " "

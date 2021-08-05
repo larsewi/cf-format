@@ -64,7 +64,7 @@ class Token:
 
     def line_no(self):
         return self._line_no
-    
+
     def column(self):
         return self._column
 

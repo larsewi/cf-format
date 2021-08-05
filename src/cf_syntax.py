@@ -28,7 +28,7 @@ class CFSyntax(ABC):
 
     def indent(self):
         CFSyntax._indent += 2
-    
+
     def dedent(self):
         assert CFSyntax._indent >= 2
         CFSyntax._indent -= 2

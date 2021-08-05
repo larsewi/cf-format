@@ -15,15 +15,14 @@ def main():
         buffer = policy.pretty_print()
         # TODO: Open file in a safer manner
         assert config.debug == "print", "You sure about this?"
-        file = sys.stdout if config.debug == "print" else open(filename, 'w')
+        file = sys.stdout if config.debug == "print" else open(filename, "w")
         file.write(buffer)
         file.close()
 
 
 def parse_arguments():
     arg_parser = argparse.ArgumentParser(
-        description="Simple CFEngine policy formatting tool",
-        epilog="Jeez Louise ...",
+        description="Simple CFEngine policy formatting tool", epilog="Jeez Louise ...",
     )
     arg_parser.add_argument(
         "-d",
