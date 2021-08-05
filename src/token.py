@@ -89,6 +89,5 @@ class TokenList(list):
 
     def skip(self, expected):
         found = self.current().kind()
-        if found is not expected:
-            panic(f"Expected token '{expected.name}', found token '{found.name}'")
+        assert found is expected
         return self.pop(0)
