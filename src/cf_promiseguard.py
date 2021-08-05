@@ -20,4 +20,4 @@ class CFPromiseGuard(CFSyntax):
         return promiseguard
 
     def pretty_print(self, cursor=0):
-        return ""
+        return self._value

@@ -47,7 +47,7 @@ class CFBundleStatement(CFSyntax):
 
         promiseguard = nonterms.pop(0)
         assert isinstance(promiseguard, CFPromiseGuard)
-        buf = promiseguard.pretty_print()
+        buf = "  " + promiseguard.pretty_print() + "\n"
 
         first = True
         while nonterms:
@@ -58,10 +58,10 @@ class CFBundleStatement(CFSyntax):
 
             nonterm = nonterms.pop(0)
             while isinstance(nonterm, CFComment):
-                buf += "  " + nonterm.pretty_print() + "\n"
+                buf += "    " + nonterm.pretty_print() + "\n"
                 nonterm = nonterms.pop(0)
 
             assert isinstance(nonterm, CFPromiseLine)
-            buf += "  " + nonterm.pretty_print() + "\n"
+            buf += nonterm.pretty_print()
             
         return buf

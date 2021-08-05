@@ -26,7 +26,7 @@ class CFPromiseLine(CFSyntax):
         while tokens.current().kind() is TokenKind.COMMENT:
             comment = CFComment.parse(tokens, debug)
             assert comment is not None
-            nonterms.append(classguard)
+            nonterms.append(comment)
 
         # Parse promiser
         current = tokens.current()
@@ -69,18 +69,16 @@ class CFPromiseLine(CFSyntax):
         # classguard
         nonterm = nonterms.pop(0)
         if isinstance(nonterm, CFClassGuard):
-            buf += nonterm.pretty_print() + "\n"
+            buf += "    " + nonterm.pretty_print() + "\n"
             nonterm = nonterms.pop(0)
 
         # comment
         while isinstance(nonterm, CFComment):
-            buf += "  " + nonterm.pretty_print() + "\n"
+            buf += "      " + nonterm.pretty_print() + "\n"
             nonterm = nonterms.pop(0)
 
         # promiser
-        print(type(nonterm).__name__)
         assert isinstance(nonterm, CFQuotedString)
-        buf += "    " + nonterm.pretty_print()
-        nonterm = nonterms.pop(0)
+        buf += "      " + nonterm.pretty_print()
 
-        return ""
+        return buf + ";"

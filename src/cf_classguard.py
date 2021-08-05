@@ -12,8 +12,8 @@ class CFClassGuard(CFSyntax):
         classguard = CFClassGuard(debug)
         classguard.enter_parser()
 
-        current = tokens.skip(TokenKind.CLASS_GUARD)
-        classguard._value = current.value()
+        skipped = tokens.skip(TokenKind.CLASS_GUARD)
+        classguard._value = skipped.value()
         assert isinstance(classguard._value, str)
 
         classguard.leave_parser()

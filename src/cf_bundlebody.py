@@ -45,11 +45,16 @@ class CFBundleBody(CFSyntax):
         buf = ""
         nonterms = self._nonterms
 
+        last = False
         for nonterm in nonterms:
+            if last:
+                buf += "\n"
+                last = False
             if isinstance(nonterm, CFComment):
-                buf += "  " + nonterm.pretty_print() + "\n"
+                buf += nonterm.pretty_print() + "\n"
             else:
                 assert isinstance(nonterm, CFBundleStatement)
-                buf += "  " + nonterm.pretty_print() + "\n\n"
+                buf += nonterm.pretty_print()
+                last = True
 
         return "{\n" + buf + "\n}"

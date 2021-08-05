@@ -47,4 +47,4 @@ class CFPolicy(CFSyntax):
             buf += nonterm.pretty_print() + "\n"
             if isinstance(nonterm, CFComment):
                 buf += "\n"
-        return buf
+        return buf + "\n"
