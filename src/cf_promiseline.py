@@ -11,7 +11,7 @@ class CFPromiseLine(CFSyntax):
         super().__init__("promiseline", debug)
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         promiseline = CFPromiseLine(debug)
         promiseline.enter_parser()
         nonterms = promiseline._nonterms
@@ -62,23 +62,5 @@ class CFPromiseLine(CFSyntax):
         promiseline.leave_parser()
         return promiseline
 
-    def pretty_print(self, cursor=0):
-        nonterms = self._nonterms
-        buf = ""
-
-        # classguard
-        nonterm = nonterms.pop(0)
-        if isinstance(nonterm, CFClassGuard):
-            buf += "    " + nonterm.pretty_print() + "\n"
-            nonterm = nonterms.pop(0)
-
-        # comment
-        while isinstance(nonterm, CFComment):
-            buf += "      " + nonterm.pretty_print() + "\n"
-            nonterm = nonterms.pop(0)
-
-        # promiser
-        assert isinstance(nonterm, CFQuotedString)
-        buf += "      " + nonterm.pretty_print()
-
-        return buf + ";"
+    def pretty_print(self, pretty):
+        pass

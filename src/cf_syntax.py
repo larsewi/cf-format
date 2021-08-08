@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from error import eprint, exit_failure
-from token import TokenKind
+from token import TokenKind as TK
+from cf_commentblock import CFCommentBlock
+from cf_macro import CFMacro
 
 
 class CFSyntax(ABC):
@@ -13,7 +15,7 @@ class CFSyntax(ABC):
         self._nonterms = []
 
     @abstractmethod
-    def pretty_print(self, cursor=0) -> str:
+    def pretty_print(self, pp):
         pass
 
     def enter_parser(self):
@@ -35,7 +37,7 @@ class CFSyntax(ABC):
 
     def parser_error(self, found, *expected):
         eprint(
-            f"There are syntax errors in policy file '{found.filename()}' on line {found.line_no()}\n"
+            f"There are syntax errors in policy file '{found.filename()}' on line {found.row() + 1}\n"
         )
         eprint(found.line())
         eprint(" " * found.column() + f"^ Unexpected token '{found.value()}'")

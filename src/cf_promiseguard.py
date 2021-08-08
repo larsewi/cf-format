@@ -8,7 +8,7 @@ class CFPromiseGuard(CFSyntax):
         self._value = None
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         promiseguard = CFPromiseGuard(debug)
         promiseguard.enter_parser()
 
@@ -19,5 +19,5 @@ class CFPromiseGuard(CFSyntax):
         promiseguard.leave_parser()
         return promiseguard
 
-    def pretty_print(self, cursor=0):
-        return self._value
+    def pretty_print(self, pretty):
+        pass

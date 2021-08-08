@@ -8,7 +8,7 @@ class CFIdentifier(CFSyntax):
         self._value = None
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         identifier = CFIdentifier(debug)
         identifier.enter_parser()
 
@@ -19,5 +19,5 @@ class CFIdentifier(CFSyntax):
         identifier.leave_parser()
         return identifier
 
-    def pretty_print(self, cursor=0):
-        return self._value
+    def pretty_print(self, pretty):
+        pass

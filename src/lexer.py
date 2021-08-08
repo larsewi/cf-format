@@ -24,14 +24,12 @@ class Lexer:
 
         tokens = TokenList()
         lines = contents.splitlines()
-        line_no = 0
-        for line in lines:
-            line_no += 1
-            tokens += self._tokenize_line(line, line_no)
+        for row, line in enumerate(lines):
+            tokens += self._tokenize_line(line, row)
 
         return tokens
 
-    def _tokenize_line(self, line, line_no):
+    def _tokenize_line(self, line, row):
         tokens = TokenList()
         i = 0
         j = len(line)
@@ -39,7 +37,7 @@ class Lexer:
         while i < j:
             for kind in TokenKind:
                 if re.fullmatch(kind.value, line[i:j]):
-                    token = Token(kind, line[i:j], self._filename, line, line_no, i)
+                    token = Token(kind, line[i:j], self._filename, line, row, i)
                     if kind != TokenKind.WHITESPACE:  # ignore whitespace tokens
                         tokens.append(token)
                         if self._debug:
@@ -50,7 +48,7 @@ class Lexer:
             j -= 1
 
         if i != len(line):
-            Lexer.lexer_error(line_no, i, line)
+            Lexer.lexer_error(row, i, line)
 
         return tokens
 

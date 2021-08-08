@@ -8,7 +8,7 @@ class CFConstraint(CFSyntax):
         super().__init__("constraint", debug)
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         constraint = CFConstraint(debug)
         constraint.enter_parser()
 
@@ -26,5 +26,5 @@ class CFConstraint(CFSyntax):
         constraint.leave_parser()
         return constraint
 
-    def pretty_print(self, cursor=0):
-        return ""
+    def pretty_print(self, pretty):
+        pass

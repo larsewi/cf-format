@@ -1,7 +1,9 @@
 from cf_arglist import CFArgList
 from cf_bundlebody import CFBundleBody
 from cf_comment import CFComment
+from cf_commentblock import CFCommentBlock
 from cf_identifier import CFIdentifier
+from cf_macro import CFMacro
 from cf_syntax import CFSyntax
 from token import TokenKind
 
@@ -18,105 +20,35 @@ class CFBundle(CFSyntax):
 
         tokens.skip(TokenKind.BUNDLE)
 
-        # Parse comments if any
-        while tokens.current().kind() is TokenKind.COMMENT:
-            comment = CFComment.parse(tokens, debug)
-            assert comment is not None
-            nonterms.append(comment)
+        CFSyntax.parse_while_comment_or_macro(nonterms, tokens, debug)
 
         # Parse bundletype
-        current = tokens.current()
-        if current.kind() is not TokenKind.IDENTIFIER:
-            bundle.parser_error(current, TokenKind.IDENTIFIER)
-        bundletype = CFIdentifier.parse(tokens, debug)
-        assert bundletype is not None
-        nonterms.append(bundletype)
+        if tokens.current().kind() is not TokenKind.IDENTIFIER:
+            bundle.parser_error(tokens.current(), TokenKind.IDENTIFIER)
+        nonterms.append(CFIdentifier.parse(tokens, debug))
 
-        # Parse comments if any
-        while tokens.current().kind() is TokenKind.COMMENT:
-            comment = CFComment.parse(tokens, debug)
-            assert comment is not None
-            nonterms.append(comment)
+        CFSyntax.parse_while_comment_or_macro(nonterms, tokens, debug)
 
         # Parse bundleid
-        current = tokens.current()
-        if current.kind() is not TokenKind.IDENTIFIER:
-            bundle.parser_error(current, TokenKind.IDENTIFIER)
-        bundleid = CFIdentifier.parse(tokens, debug)
-        assert bundleid is not None
-        nonterms.append(bundleid)
+        if tokens.current.kind() is not TokenKind.IDENTIFIER:
+            bundle.parser_error(tokens.current(), TokenKind.IDENTIFIER)
+        nonterms.append(CFIdentifier.parse(tokens, debug))
 
-        # Parse comments if any
-        while tokens.current().kind() is TokenKind.COMMENT:
-            comment = CFComment.parse(tokens, debug)
-            assert comment is not None
-            nonterms.append(comment)
+        CFSyntax.parse_while_comment_or_macro(nonterms, tokens, debug)
 
         # Parse arglist
         if tokens.current().kind() is TokenKind.LEFT_PAR:
-            arglist = CFArgList.parse(tokens, debug)
-            assert arglist is not None
-            nonterms.append(arglist)
+            nonterms.append(CFArgList.parse(tokens, debug))
 
-        # Parse comments if any
-        while tokens.current().kind() is TokenKind.COMMENT:
-            comment = CFComment.parse(tokens, debug)
-            assert comment is not None
-            nonterms.append(comment)
+        CFSyntax.parse_while_comment_or_macro(nonterms, tokens, debug)
 
         # Parse bundlebody
-        bundlebody = CFBundleBody.parse(tokens, debug)
-        assert bundlebody is not None
-        nonterms.append(bundlebody)
+        nonterms.append(CFBundleBody.parse(tokens, debug))
 
         bundle.leave_parser()
         return bundle
 
-    def pretty_print(self, cursor=0):
+    def pretty_print(self, pp):
         nonterms = self._nonterms
-        s = "bundle "
-        cursor += len(s)
-        buf = s
 
-        while isinstance(nonterms[0], CFComment):
-            comment = nonterms.pop(0)
-            buf += comment.pretty_print() + "\n"
-            cursor = 0
-
-        bundletype = nonterms.pop(0)
-        assert isinstance(bundletype, CFIdentifier)
-        s = bundletype.pretty_print() + " "
-        cursor += len(s)
-        buf += s
-
-        while isinstance(nonterms[0], CFComment):
-            comment = nonterms.pop(0)
-            buf += comment.pretty_print() + "\n"
-            cursor = 0
-
-        bundleid = nonterms.pop(0)
-        assert isinstance(bundleid, CFIdentifier)
-        s = bundleid.pretty_print()
-        cursor += len(s)
-        buf += s
-
-        while isinstance(nonterms[0], CFComment):
-            comment = nonterms.pop(0)
-            buf += comment.pretty_print() + "\n"
-            cursor = 0
-
-        if isinstance(nonterms[0], CFArgList):
-            arglist = nonterms.pop(0)
-            buf += arglist.pretty_print(cursor) + "\n"
-            cursor = 0
-
-        while isinstance(nonterms[0], CFComment):
-            comment = nonterms.pop(0)
-            buf += comment.pretty_print() + "\n"
-            cursor = 0
-
-        bundlebody = nonterms.pop(0)
-        assert isinstance(bundlebody, CFBundleBody)
-        buf += bundlebody.pretty_print()
-
-        return buf
+        pp.print("bundle ")

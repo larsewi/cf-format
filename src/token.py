@@ -30,12 +30,12 @@ class TokenKind(Enum):
 
 
 class Token:
-    def __init__(self, kind, value, filename, line, line_no, column):
+    def __init__(self, kind, value, filename, line, row, column):
         self._kind = kind
         self._value = value
         self._filename = filename
         self._line = line
-        self._line_no = line_no
+        self._row = row
         self._column = column
 
     def kind(self):
@@ -50,30 +50,18 @@ class Token:
     def line(self):
         return self._line
 
-    def line_no(self):
-        return self._line_no
-
-    def column(self):
-        return self._column
-
-    def filename(self):
-        return self._filename
-
-    def line(self):
-        return self._line
-
-    def line_no(self):
-        return self._line_no
+    def row(self):
+        return self.row
 
     def column(self):
         return self._column
 
     def __str__(self):
         return f"\
-Token   : {self._kind.name}\n\
-Line no : {self._line_no}\n\
-Column  : {self._column}\n\
-Value   : '{self._value}'\n"
+Token  : {self._kind.name}\n\
+Row    : {self._row + 1}\n\
+Column : {self._column + 1}\n\
+Value  : '{self._value}'\n"
 
 
 class TokenList(list):

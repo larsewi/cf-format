@@ -41,20 +41,5 @@ class CFBundleBody(CFSyntax):
         bundlebody.leave_parser()
         return bundlebody
 
-    def pretty_print(self, cursor=0):
-        buf = ""
-        nonterms = self._nonterms
-
-        last = False
-        for nonterm in nonterms:
-            if last:
-                buf += "\n"
-                last = False
-            if isinstance(nonterm, CFComment):
-                buf += nonterm.pretty_print() + "\n"
-            else:
-                assert isinstance(nonterm, CFBundleStatement)
-                buf += nonterm.pretty_print()
-                last = True
-
-        return "{\n" + buf + "\n}"
+    def pretty_print(self, pretty):
+        pass

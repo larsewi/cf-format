@@ -8,7 +8,7 @@ class CFClassGuard(CFSyntax):
         self._value = None
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         classguard = CFClassGuard(debug)
         classguard.enter_parser()
 
@@ -19,5 +19,5 @@ class CFClassGuard(CFSyntax):
         classguard.leave_parser()
         return classguard
 
-    def pretty_print(self, cursor=0):
-        return self._value
+    def pretty_print(self, pretty):
+        pass

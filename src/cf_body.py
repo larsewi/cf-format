@@ -15,5 +15,5 @@ class CFBody(CFSyntax):
         body.leave_parser()
         return body
 
-    def pretty_print(self, cursor=0):
-        return ""
+    def pretty_print(self, pretty):
+        pass

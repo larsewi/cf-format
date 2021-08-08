@@ -7,7 +7,7 @@ class CFRval(CFSyntax):
         super().__init__("rval", debug)
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         rval = CFRval(debug)
         rval.enter_parser()
 
@@ -34,5 +34,5 @@ class CFRval(CFSyntax):
         rval.leave_parser()
         return rval
 
-    def pretty_print(self, cursor=0):
-        return ""
+    def pretty_print(self, pretty):
+        pass

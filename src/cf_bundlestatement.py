@@ -10,7 +10,7 @@ class CFBundleStatement(CFSyntax):
         super().__init__("bundlestatement", debug)
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         bundlestatement = CFBundleStatement(debug)
         bundlestatement.enter_parser()
         nonterms = bundlestatement._nonterms
@@ -42,26 +42,5 @@ class CFBundleStatement(CFSyntax):
         bundlestatement.leave_parser()
         return bundlestatement
 
-    def pretty_print(self, cursor=0):
-        nonterms = self._nonterms
-
-        promiseguard = nonterms.pop(0)
-        assert isinstance(promiseguard, CFPromiseGuard)
-        buf = "  " + promiseguard.pretty_print() + "\n"
-
-        first = True
-        while nonterms:
-            if first:
-                first = False
-            else:
-                buf += "\n"
-
-            nonterm = nonterms.pop(0)
-            while isinstance(nonterm, CFComment):
-                buf += "    " + nonterm.pretty_print() + "\n"
-                nonterm = nonterms.pop(0)
-
-            assert isinstance(nonterm, CFPromiseLine)
-            buf += nonterm.pretty_print()
-
-        return buf
+    def pretty_print(self, pretty):
+        pass

@@ -8,7 +8,7 @@ class CFQuotedString(CFSyntax):
         self._value = None
 
     @staticmethod
-    def parse(tokens, debug):
+    def parse(tokens, debug) -> CFSyntax:
         qstring = CFQuotedString(debug)
         qstring.enter_parser()
 
@@ -19,5 +19,5 @@ class CFQuotedString(CFSyntax):
         qstring.leave_parser()
         return qstring
 
-    def pretty_print(self, cursor=0):
-        return self._value
+    def pretty_print(self, pretty):
+        pass

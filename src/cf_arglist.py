@@ -40,33 +40,5 @@ class CFArgList(CFSyntax):
         arglist.leave_parser()
         return arglist
 
-    def pretty_print(self, cursor=0):
-        nonterms = self._nonterms
-
-        # Wrap if there are comments in arglist
-        should_wrap = any(isinstance(el, CFComment) for el in nonterms)
-
-        if not should_wrap:
-            buf = "(" + ", ".join(map(lambda el: el.pretty_print(), nonterms)) + ")"
-            if cursor + len(buf) <= self._WRAP_LENGTH:
-                return buf
-
-        count = len(list(filter(lambda el: isinstance(el, CFIdentifier), nonterms)))
-        buf = ""
-        last_was_identifier = False
-        for nonterm in nonterms:
-            if isinstance(nonterm, CFComment):
-                if last_was_identifier:
-                    buf += " " + nonterm.pretty_print()
-                else:
-                    buf += "\n  " + " " * cursor + nonterm.pretty_print()
-                last_was_identifier = False
-            else:
-                assert isinstance(nonterm, CFIdentifier)
-                buf += "\n  " + " " * cursor + nonterm.pretty_print()
-                if count > 1:
-                    buf += ","
-                    count -= 1
-                last_was_identifier = True
-
-        return "(" + buf + "\n" + " " * cursor + ")"
+    def pretty_print(self, pretty):
+        pass

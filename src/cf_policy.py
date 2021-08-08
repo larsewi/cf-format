@@ -1,4 +1,6 @@
 from token import TokenKind
+from cf_commentblock import CFCommentBlock
+from cf_macro import CFMacro
 from cf_syntax import CFSyntax
 from cf_comment import CFComment
 from cf_bundle import CFBundle
@@ -25,26 +27,25 @@ class CFPolicy(CFSyntax):
             elif kind is TokenKind.PROMISE:
                 nonterm = CFPromise.parse(tokens, debug)
             elif kind is TokenKind.COMMENT:
-                nonterm = CFComment.parse(tokens, debug)
+                nonterm = CFCommentBlock.parse(tokens, debug)
+            elif kind is TokenKind.MACRO:
+                nonterm = CFMacro.parse(tokens, debug)
             else:
                 policy.parser_error(
                     tokens.current(),
-                    TokenKind.COMMENT,
                     TokenKind.BUNDLE,
                     TokenKind.BODY,
                     TokenKind.PROMISE,
+                    TokenKind.COMMENT,
+                    TokenKind.MACRO,
                 )
 
-            assert nonterm != None
             policy._nonterms.append(nonterm)
 
         policy.leave_parser()
         return policy
 
-    def pretty_print(self, cursor=0):
-        buf = ""
+    def pretty_print(self, pp):
         for nonterm in self._nonterms:
-            buf += nonterm.pretty_print() + "\n"
-            if isinstance(nonterm, CFComment):
-                buf += "\n"
-        return buf + "\n"
+            nonterm.pretty_print(pp)
+        pp.println()
