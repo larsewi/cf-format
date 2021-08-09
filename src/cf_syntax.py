@@ -1,13 +1,9 @@
 from abc import ABC, abstractmethod
 from error import eprint, exit_failure
-from token import TokenKind as TK
-from cf_commentblock import CFCommentBlock
-from cf_macro import CFMacro
 
 
 class CFSyntax(ABC):
     _indent = 0
-    _WRAP_LENGTH = 80
 
     def __init__(self, name, debug):
         self._name = name

@@ -14,10 +14,10 @@ class CFIdentifier(CFSyntax):
 
         current = tokens.skip(TokenKind.IDENTIFIER)
         identifier._value = current.value()
-        assert isinstance(identifier._value, str)
 
         identifier.leave_parser()
         return identifier
 
-    def pretty_print(self, pretty):
-        pass
+    def pretty_print(self, pp):
+        assert isinstance(self._value, str)
+        pp.print(self._value)

@@ -2,7 +2,6 @@ from token import TokenKind
 from cf_commentblock import CFCommentBlock
 from cf_macro import CFMacro
 from cf_syntax import CFSyntax
-from cf_comment import CFComment
 from cf_bundle import CFBundle
 from cf_body import CFBody
 from cf_promise import CFPromise
@@ -35,9 +34,7 @@ class CFPolicy(CFSyntax):
                     tokens.current(),
                     TokenKind.BUNDLE,
                     TokenKind.BODY,
-                    TokenKind.PROMISE,
-                    TokenKind.COMMENT,
-                    TokenKind.MACRO,
+                    TokenKind.PROMISE
                 )
 
             policy._nonterms.append(nonterm)

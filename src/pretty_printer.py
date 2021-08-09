@@ -7,6 +7,7 @@ class PrettyPrinter:
     def print(self, string):
         assert "\n" not in string
 
+        indent = ""
         if self._cursor == 0:
             indent = " " * self._indent
             print(indent, file=self._file, end="")

@@ -2,6 +2,7 @@ import argparse
 import sys
 from cf_policy import CFPolicy
 from lexer import Lexer
+from pretty_printer import PrettyPrinter
 
 
 def main():
@@ -12,12 +13,10 @@ def main():
         tokens = lexer.tokenize()
         policy = CFPolicy.parse(tokens, config.debug == "parser")
 
-        buffer = policy.pretty_print()
-        # TODO: Open file in a safer manner
         assert config.debug == "print", "You sure about this?"
         file = sys.stdout if config.debug == "print" else open(filename, "w")
-        file.write(buffer)
-        file.close()
+        pp = PrettyPrinter(file)
+        policy.pretty_print(pp)
 
 
 def parse_arguments():
