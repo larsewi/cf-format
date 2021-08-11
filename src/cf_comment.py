@@ -23,7 +23,7 @@ class CFComment(CFSyntax):
         return comment
 
     def pretty_print(self, pp):
-        col, row = pp.get_cursor()
+        col, _ = pp.get_cursor()
         if col < self._column:
             pp.align(self._column - col)
-        pp.println(self._value)
+        pp.print_no_indent(self._value)

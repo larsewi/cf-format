@@ -1,4 +1,5 @@
 from cf_syntax import CFSyntax
+from token import TokenKind as TK
 
 
 class CFMacro(CFSyntax):
@@ -10,12 +11,12 @@ class CFMacro(CFSyntax):
         macro = CFMacro(debug)
         macro.enter_parser()
 
-        skipped = tokens.current().skip(CFMacro)
-        macro._value = skipped.value()
+        current = tokens.skip(TK.MACRO)
+        macro._value = current.value()
         assert isinstance(macro._value, str)
 
         macro.leave_parser()
         return macro
 
-    def pretty_print(self, pretty):
-        pass
+    def pretty_print(self, pp):
+        pp.print_no_indent(self._value)

@@ -1,4 +1,6 @@
+from cf_commentblock import CFCommentBlock
 from cf_identifier import CFIdentifier
+from cf_macro import CFMacro
 from cf_syntax import CFSyntax
 from cf_misc import parse_while_comment_or_macro
 from token import TokenKind as TK
@@ -52,4 +54,38 @@ class CFArgList(CFSyntax):
         return arglist
 
     def pretty_print(self, pp):
-        pp.delete(2)
+        pp.print("(")
+
+        if self._no_wrap_failed(pp):
+            pp.println()
+            pp.indent()
+            if self._no_wrap_failed(pp):
+                self._full_wrap(pp)
+            pp.dedent()
+            pp.println()
+        pp.print(")")
+
+    def _no_wrap_failed(self, pp):
+        old_cursor = pp.get_cursor()
+        first = True
+
+        for nonterm in self._nonterms:
+            if not isinstance(nonterm, CFIdentifier):
+                pp.truncate_to(old_cursor)
+                return True
+
+            if first:
+                first = False
+            else:
+                pp.print(", ")
+
+            nonterm.pretty_print(pp)
+
+            if pp.should_wrap(1):
+                pp.truncate_to(old_cursor)
+                return True
+
+        return False
+
+    def _full_wrap(nonterms, pp):
+        return True
