@@ -1,3 +1,6 @@
+import os
+
+
 class PrettyPrinter:
     def __init__(self, file):
         self._file = file
@@ -10,29 +13,36 @@ class PrettyPrinter:
         indent = ""
         if self._cursor == 0:
             indent = " " * self._indent
-            print(indent, file=self._file, end="")
+            self._file.write(bytes(indent, "utf-8"))
             col, row = self._cursor
             self._cursor = (col + len(indent), row)
 
-        print(string, file=self._file, end="")
+        self._file.write(bytes(string, "utf-8"))
         col, row = self._cursor
-        self._cursor = (col + len(indent), row)
+        self._cursor = (col + len(indent) + len(string), row)
 
     def println(self, string=""):
         assert "\n" not in string
 
-        print(string, file=self._file)
+        self._file.write(bytes(string + "\n", "utf-8"))
         col, row = self._cursor
         self._cursor = (0, row + 1)
+
+    def delete(self, num_chars):
+        col, row = self._cursor
+        assert num_chars <= col
+        self._file.seek(-num_chars, os.SEEK_END)
+        self._file.truncate()
+        self._cursor = (col - num_chars, row)
 
     def get_cursor(self):
         return self._cursor
 
-    def align(self, spaces):
-        align = " " * spaces
-        print(align, file=self._file)
+    def align(self, num_chars):
+        align = " " * num_chars
+        self._file.write(bytes(align, "utf-8"))
         col, row = self._cursor
-        self._cursor = (col + len(spaces), row)
+        self._cursor = (col + num_chars, row)
 
     def indent(self):
         assert self._indent % 2 == 0

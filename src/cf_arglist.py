@@ -1,7 +1,7 @@
 from cf_identifier import CFIdentifier
 from cf_syntax import CFSyntax
 from cf_misc import parse_while_comment_or_macro
-from token import TokenKind
+from token import TokenKind as TK
 
 
 class CFArgList(CFSyntax):
@@ -14,28 +14,42 @@ class CFArgList(CFSyntax):
         arglist.enter_parser()
         nonterms = arglist._nonterms
 
-        tokens.skip(TokenKind.LEFT_PAR)
+        tokens.skip(TK.LEFT_PAR)
+        last = TK.LEFT_PAR
 
-        while True:
-            parse_while_comment_or_macro(nonterms, tokens, debug)
+        while tokens:
+            # Argument
+            if tokens.current().kind() is TK.IDENTIFIER:
+                if last not in (TK.LEFT_PAR, TK.COMMA):
+                    arglist.parser_error(tokens.current(), TK.COMMA)
+                last = TK.IDENTIFIER
+                nonterms.append(CFIdentifier.parse(tokens, debug))
 
-            if tokens.current().kind() is not TokenKind.IDENTIFIER:
-                arglist.parser_error(tokens.current(), TokenKind.IDENTIFIER)
-            nonterms.append(CFIdentifier.parse(tokens, debug))
+            # Comma
+            elif tokens.current().kind() is TK.COMMA:
+                if last is not TK.IDENTIFIER:
+                    arglist.parser_error(tokens.current(), TK.IDENTIFIER)
+                last = TK.COMMA
+                tokens.skip(TK.COMMA)
 
-            parse_while_comment_or_macro(nonterms, tokens, debug)
-
-            if tokens.current().kind() is TokenKind.COMMA:
-                tokens.skip(TokenKind.COMMA)
-            else:
+            # Right parentisis
+            elif tokens.current().kind() is TK.RIGHT_PAR:
+                if last is not TK.IDENTIFIER:
+                    arglist.parser_error(tokens.current(), TK.IDENTIFIER)
+                last = TK.RIGHT_PAR
+                tokens.skip(TK.RIGHT_PAR)
                 break
 
-        if tokens.current().kind() is not TokenKind.RIGHT_PAR:
-            arglist.parser_error(tokens.current(), TokenKind.RIGHT_PAR, TokenKind.COMMA)
-        tokens.skip(TokenKind.RIGHT_PAR)
+            # Comments or macro
+            else:
+                assert tokens.current().kind() in (TK.COMMENT, TK.MACRO)
+                parse_while_comment_or_macro(nonterms, tokens, debug)
+        
+        if last is not TK.RIGHT_PAR:
+            arglist.parser_error_empty(TK.LEFT_PAR)
 
         arglist.leave_parser()
         return arglist
 
     def pretty_print(self, pp):
-        pass
+        pp.delete(2)

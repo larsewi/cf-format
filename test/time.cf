@@ -1,13 +1,20 @@
-# This is an ugly policy file
+#
+  # This is an ugly policy file
+#
+
+
+
+
+#
+#
 
 bundle agent report_time(
-                          hours # too few hours in a day
-                          ,minutes, 
-                          seconds
- )
+  hours,
+  minutes,
+  seconds
+)
 # Bundle to report time
 {
   reports: # report stuff
-    any:: # do this no matter what
-      "Time is $(hours):$(minutes):$(seconds)";
+    "Time is $(hours):$(minutes):$(seconds)";
 }

@@ -52,3 +52,16 @@ class CFSyntax(ABC):
         eprint("\nFor more information run:")
         eprint(f"\tcf-promises '{found.filename()}'")
         exit_failure()
+
+    def parser_error_empty(self, *expected):
+        eprint(f"There are syntax errors in policy file\n")
+        eprint(f"\nExpected: ", end="")
+        l = len(expected)
+        if l >= 3:
+            for i in range(l - 2):
+                eprint(f"{expected[i].name}, ", end="")
+        if l >= 2:
+            eprint(f"{expected[-2].name} or {expected[-1].name}")
+        else:
+            eprint(expected[0].name)
+        eprint("Found nothing")

@@ -51,7 +51,7 @@ class Token:
         return self._line
 
     def row(self):
-        return self.row
+        return self._row
 
     def column(self):
         return self._column

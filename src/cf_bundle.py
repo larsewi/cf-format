@@ -85,6 +85,10 @@ class CFBundle(CFSyntax):
             nonterm.pretty_print(pp)
             nonterm = nonterms.pop(0)
 
+        # Bundlebody
+        if isinstance(nonterm, CFBundleBody):
+            nonterm.pretty_print(pp)
+
         pp.println()
 
         # Bundlebody

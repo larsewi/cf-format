@@ -26,4 +26,4 @@ class CFComment(CFSyntax):
         col, row = pp.get_cursor()
         if col < self._column:
             pp.align(self._column - col)
-        pp.print(self._value)
+        pp.println(self._value)

@@ -31,4 +31,3 @@ class CFCommentBlock(CFSyntax):
     def pretty_print(self, pp):
         for comment in self._nonterms:
             comment.pretty_print(pp)
-        pp.println()

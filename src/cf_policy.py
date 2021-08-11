@@ -1,4 +1,5 @@
 from token import TokenKind
+from cf_comment import CFComment
 from cf_commentblock import CFCommentBlock
 from cf_macro import CFMacro
 from cf_syntax import CFSyntax
@@ -43,6 +44,12 @@ class CFPolicy(CFSyntax):
         return policy
 
     def pretty_print(self, pp):
+        last = None
         for nonterm in self._nonterms:
+            if isinstance(last, (CFBundle, CFBody, CFPromise)):
+                pp.println()
+            if isinstance(last, CFCommentBlock) and isinstance(nonterm, CFCommentBlock):
+                pp.println()
             nonterm.pretty_print(pp)
+            last = nonterm
         pp.println()
