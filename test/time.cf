@@ -9,9 +9,9 @@
 #
 
 bundle agent report_time(
-  hoursdsadsadsadasdsadasdasdsadsadasds,
-  minutes,
-  seconds
+hours, @jell
+minutes,
+seconds
 )
 # Bundle to report time
 {

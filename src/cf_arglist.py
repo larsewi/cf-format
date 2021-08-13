@@ -62,7 +62,6 @@ class CFArgList(CFSyntax):
             if self._no_wrap_failed(pp):
                 self._full_wrap(pp)
             pp.dedent()
-            pp.println()
         pp.print(")")
 
     def _no_wrap_failed(self, pp):
@@ -87,5 +86,13 @@ class CFArgList(CFSyntax):
 
         return False
 
-    def _full_wrap(nonterms, pp):
-        return True
+    def _full_wrap(self, pp):
+        num_id = len([id for id in self._nonterms if isinstance(id, CFIdentifier)])
+
+        for nonterm in self._nonterms:
+            nonterm.pretty_print(pp)
+            if isinstance(nonterm, CFIdentifier):
+                if num_id > 1:
+                    pp.print(",")
+                num_id -= 1
+                pp.println()
