@@ -57,7 +57,7 @@ class CFBundle(CFSyntax):
         nonterm = nonterms.pop(0)
         while isinstance(nonterm, (CFCommentBlock, CFMacro)):
             nonterm.pretty_print(pp)
-            nonterms.pop(0)
+            nonterm = nonterms.pop(0)
 
         # Bundletype
         assert isinstance(nonterm, CFIdentifier)
@@ -75,6 +75,9 @@ class CFBundle(CFSyntax):
         nonterm.pretty_print(pp)
         nonterm = nonterms.pop(0)
 
+        if not isinstance(nonterm, CFArgList):
+            pp.println()
+
         # Comment / macro
         while isinstance(nonterm, (CFCommentBlock, CFMacro)):
             nonterm.pretty_print(pp)
@@ -84,11 +87,13 @@ class CFBundle(CFSyntax):
         if isinstance(nonterm, CFArgList):
             nonterm.pretty_print(pp)
             nonterm = nonterms.pop(0)
+            pp.println()
 
-        # Bundlebody
-        if isinstance(nonterm, CFBundleBody):
+        # Comment / macro
+        while isinstance(nonterm, (CFCommentBlock, CFMacro)):  # glekki,  # glekki
             nonterm.pretty_print(pp)
-
-        pp.println()
+            nonterm = nonterms.pop(0)
 
         # Bundlebody
+        assert isinstance(nonterm, CFBundleBody)
+        nonterm.pretty_print(pp)

@@ -46,7 +46,7 @@ class CFArgList(CFSyntax):
             else:
                 assert tokens.current().kind() in (TK.COMMENT, TK.MACRO)
                 parse_while_comment_or_macro(nonterms, tokens, debug)
-        
+
         if last is not TK.RIGHT_PAR:
             arglist.parser_error_empty(TK.LEFT_PAR)
 
@@ -62,6 +62,7 @@ class CFArgList(CFSyntax):
             if self._no_wrap_failed(pp):
                 self._full_wrap(pp)
             pp.dedent()
+            pp.println()
         pp.print(")")
 
     def _no_wrap_failed(self, pp):
@@ -89,10 +90,16 @@ class CFArgList(CFSyntax):
     def _full_wrap(self, pp):
         num_id = len([id for id in self._nonterms if isinstance(id, CFIdentifier)])
 
+        first = True
+        last = None
         for nonterm in self._nonterms:
+            if first:
+                first = False
+            elif isinstance(nonterm, CFIdentifier) and isinstance(last, CFIdentifier):
+                pp.println()
             nonterm.pretty_print(pp)
             if isinstance(nonterm, CFIdentifier):
                 if num_id > 1:
                     pp.print(",")
                 num_id -= 1
-                pp.println()
+            last = nonterm

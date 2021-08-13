@@ -35,7 +35,7 @@ class CFPolicy(CFSyntax):
                     tokens.current(),
                     TokenKind.BUNDLE,
                     TokenKind.BODY,
-                    TokenKind.PROMISE
+                    TokenKind.PROMISE,
                 )
 
             policy._nonterms.append(nonterm)

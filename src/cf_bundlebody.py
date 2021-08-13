@@ -41,5 +41,8 @@ class CFBundleBody(CFSyntax):
         bundlebody.leave_parser()
         return bundlebody
 
-    def pretty_print(self, pretty):
-        pass
+    def pretty_print(self, pp):
+        pp.println("{")
+        for nonterm in self._nonterms:
+            nonterm.pretty_print(pp)
+        pp.print("}")

@@ -8,11 +8,11 @@
 #
 #
 
-bundle agent report_time(
-hours, @jell
-minutes,
-seconds
-)
+bundle #hello
+agent report_time(a, # comment
+                     # comment
+                     # comment
+b, c)
 # Bundle to report time
 {
   reports: # report stuff
