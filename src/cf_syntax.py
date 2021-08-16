@@ -61,8 +61,8 @@ class CFSyntax(ABC):
         return False if self._nonterms else True
 
     def peek(self):
-        if len(self._nonterms) > 1:
-            return self._nonterms[1]
+        if len(self._nonterms) > 0:
+            return self._nonterms[0]
         return None
 
     def parser_error(self, found, *expected):

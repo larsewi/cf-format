@@ -1,28 +1,6 @@
-#
-  # This is an ugly policy file
-#
-
-
-
-
-#
-#
-
-@ifdef
-bundle
-agent report_time(a, # comment
-                     # comment
-                     # comment
-b, c)
-# Bundle to report time
-{
-  reports: # report stuff
-    "Time is $(hours):$(minutes):$(seconds)";
-}
-
-bundle agent identifier
+# This is an ugly policy file
+bundle agent report_time(a, b, c)
 {
   reports:
-    "tjohei";
+    "Time is $(hours):$(minutes):$(seconds)";
 }
-@endif

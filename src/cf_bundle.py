@@ -46,50 +46,52 @@ class CFBundle(CFSyntax):
         return bundle
 
     def pretty_print(self, pp):
-        pass
-        pp.print("bundle ")
+        stash = []
 
-        # Comment / macro
-        nonterm = self.pop()
-        while isinstance(nonterm, (CFComment, CFMacro)):
-            nonterm.pretty_print(pp)
-            nonterm = self.pop()
-
-        # Bundletype
-        assert isinstance(nonterm, CFIdentifier)
-        nonterm.pretty_print(pp)
-        nonterm = self.pop()
+        pp.print("bundle")
         pp.print(" ")
 
         # Comment / macro
-        while isinstance(nonterm, (CFComment, CFMacro)):
-            nonterm.pretty_print(pp)
-            nonterm = self.pop()
+        while isinstance(self.peek(), (CFComment, CFMacro)):
+            if isinstance(self.peek(), CFComment):
+                stash.append(self.pop())
+            else:
+                pp.println()
+                self.pop().pretty_print(pp)
+                pp.println()
+
+        # Bundletype
+        assert isinstance(self.peek(), CFIdentifier)
+        self.pop().pretty_print(pp)
+        pp.print(" ")
+
+        # Comment / macro
+        while isinstance(self.peek(), (CFComment, CFMacro)):
+            if isinstance(self.peek(), CFComment):
+                stash.append(self.pop())
+            else:
+                self.pop().pretty_print(pp)
 
         # Bundleid
-        assert isinstance(nonterm, CFIdentifier)
-        nonterm.pretty_print(pp)
-        nonterm = self.pop()
+        assert isinstance(self.peek(), CFIdentifier), f"{type(self.peek()).__name__}"
+        self.pop().pretty_print(pp)
 
-        if not isinstance(nonterm, CFArgList):
+        if not isinstance(self.peek(), CFArgList):
             pp.println()
 
         # Comment / macro
-        while isinstance(nonterm, (CFComment, CFMacro)):
-            nonterm.pretty_print(pp)
-            nonterm = self.pop(0)
+        while isinstance(self.peek(), (CFComment, CFMacro)):
+            self.pop().pretty_print(pp)
 
         # Arglist
-        if isinstance(nonterm, CFArgList):
-            nonterm.pretty_print(pp)
-            nonterm = self.pop()
+        if isinstance(self.peek(), CFArgList):
+            self.pop().pretty_print(pp)
             pp.println()
 
         # Comment / macro
-        while isinstance(nonterm, (CFComment, CFMacro)):
-            nonterm.pretty_print(pp)
-            nonterm = self.pop()
+        while isinstance(self.peek(), (CFComment, CFMacro)):
+            self.pop().pretty_print(pp)
 
         # Bundlebody
-        assert isinstance(nonterm, CFBundleBody)
-        nonterm.pretty_print(pp)
+        assert isinstance(self.peek(), CFBundleBody)
+        self.pop().pretty_print(pp)

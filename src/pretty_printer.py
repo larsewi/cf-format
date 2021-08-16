@@ -2,52 +2,56 @@ import os
 
 
 class PrettyPrinter:
-    def __init__(self, file):
-        self._file = file
+    _MAX_COL = 80
+
+    def __init__(self, debug):
+        self._debug = debug
         self._indent = ""
-        self._cursor = (0, 0)
-        self._max_col = 80
+        self._strlst = [""]
 
-    def print(self, string):
-        col, _ = self._cursor
-        if col == 0:
-            self._file.write(bytes(self._indent, "utf-8"))
-            col, row = self._cursor
-            self._cursor = (col + len(self._indent), row)
-        self.print_no_indent(string)
+    def print(self, s):
+        assert "\n" not in s
 
-    def println(self, string=""):
-        assert "\n" not in string
-        self.print(string)
-        self._file.write(bytes("\n", "utf-8"))
-        _, row = self._cursor
-        self._cursor = (0, row + 1)
+        if not self._strlst[-1]:
+            self._strlst[-1] = self._indent
+        if s:
+            self._strlst[-1] += s
 
-    def print_no_indent(self, string=""):
-        assert "\n" not in string
-        self._file.write(bytes(string, "utf-8"))
-        col, row = self._cursor
-        self._cursor = (len(string) + col, row)
+        self._log_debug()
 
-    def truncate_to(self, cursor):
-        new_col, new_row = self._cursor
-        old_col, old_row = cursor
+    def println(self, s=""):
+        assert "\n" not in s
 
-        assert new_col >= old_col
-        assert new_row == old_row
+        if s:
+            self._strlst[-1] += s
+        self._strlst.append("")
 
-        self._file.seek(old_col - new_col, os.SEEK_END)
-        self._file.truncate()
-        self._cursor = cursor
+        self._log_debug()
+
+    def print_no_indent(self, s=""):
+        assert "\n" not in s
+
+        if s:
+            self._strlst[-1] += s
+
+        self._log_debug()
 
     def get_cursor(self):
-        return self._cursor
+        row = len(self._strlst)
+        col = len(self._strlst[-1])
+        return (row, col)
 
-    def align(self, num_chars):
-        align = " " * num_chars
-        self._file.write(bytes(align, "utf-8"))
-        col, row = self._cursor
-        self._cursor = (col + num_chars, row)
+    def truncate_to(self, cursor):
+        row, col = cursor
+        self._strlst = self._strlst[: row - 1]
+        self._strlst[-1] = self._strlst[-1][: col - 1]
+
+        self._log_debug()
+
+    def align(self, spaces):
+        self._strlst[-1] += " " * spaces
+
+        self._log_debug()
 
     def indent(self):
         assert len(self._indent) % 2 == 0
@@ -59,5 +63,12 @@ class PrettyPrinter:
         self._indent = self._indent[:-2]
 
     def should_wrap(self, pluss=0):
-        col, _ = self._cursor
-        return col + pluss > self._max_col
+        col = len(self._strlst[-1])
+        return col + pluss > self._MAX_COL
+
+    def __str__(self):
+        return "\n".join(self._strlst)
+
+    def _log_debug(self):
+        if self._debug:
+            print(self._strlst[-1].replace(" ", "·"))

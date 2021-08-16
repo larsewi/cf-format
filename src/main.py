@@ -13,9 +13,9 @@ def main():
         tokens = lexer.tokenize()
         policy = CFPolicy.parse(tokens, config.debug == "parser")
 
-        file = open(filename + ".out", "w+b")
-        pp = PrettyPrinter(file)
+        pp = PrettyPrinter(config.debug == "printer")
         policy.pretty_print(pp)
+        print(pp)
 
 
 def parse_arguments():
@@ -25,8 +25,8 @@ def parse_arguments():
     arg_parser.add_argument(
         "-d",
         "--debug",
-        choices=["lexer", "parser"],
-        help="enable debug mode (intended for developers)",
+        choices=["lexer", "parser", "printer"],
+        help="enable different debug modes (intended for developers)",
     )
     arg_parser.add_argument("file", help="path to input files", type=str, nargs="*")
     return arg_parser.parse_args()
