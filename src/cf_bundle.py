@@ -88,18 +88,23 @@ class CFBundle(CFSyntax):
             self.pop().pretty_print(pp)
 
         # Print stashed comments
-        first = True
         for comment in stash:
-            if first:
-                first = False
-            else:
-                pp.print(" ")
+            pp.print("  ")
             comment.pretty_print(pp)
+
+        # Print trailing comment
+        if isinstance(self.peek(), CFComment):
+            if self.peek().column() > 0:
+                # We assume this is a trailing comment. Information is lost
+                # due to skipping RIGHT_PAR in parsing ArgList.
+                pp.print("  ")
+                self.pop().pretty_print(pp)
         pp.println()
 
         # Comment / macro
         while isinstance(self.peek(), (CFComment, CFMacro)):
             self.pop().pretty_print(pp)
+            pp.println()
 
         # Bundlebody
         assert isinstance(self.peek(), CFBundleBody)
