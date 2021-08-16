@@ -73,20 +73,29 @@ class CFBundle(CFSyntax):
                 self.pop().pretty_print(pp)
 
         # Bundleid
-        assert isinstance(self.peek(), CFIdentifier), f"{type(self.peek()).__name__}"
+        assert isinstance(self.peek(), CFIdentifier)
         self.pop().pretty_print(pp)
-
-        if not isinstance(self.peek(), CFArgList):
-            pp.println()
 
         # Comment / macro
         while isinstance(self.peek(), (CFComment, CFMacro)):
-            self.pop().pretty_print(pp)
+            if isinstance(self.peek(), CFComment):
+                stash.append(self.pop())
+            else:
+                self.pop().pretty_print(pp)
 
         # Arglist
         if isinstance(self.peek(), CFArgList):
             self.pop().pretty_print(pp)
-            pp.println()
+
+        # Print stashed comments
+        first = True
+        for comment in stash:
+            if first:
+                first = False
+            else:
+                pp.print(" ")
+            comment.pretty_print(pp)
+        pp.println()
 
         # Comment / macro
         while isinstance(self.peek(), (CFComment, CFMacro)):
