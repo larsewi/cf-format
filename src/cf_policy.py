@@ -1,6 +1,5 @@
-from token import TokenKind
+from token import TokenKind as tk
 from cf_comment import CFComment
-from cf_commentblock import CFCommentBlock
 from cf_macro import CFMacro
 from cf_syntax import CFSyntax
 from cf_bundle import CFBundle
@@ -17,39 +16,39 @@ class CFPolicy(CFSyntax):
         policy = CFPolicy(debug)
         policy.enter_parser()
 
-        while tokens:
-            kind = tokens.current().kind()
-            nonterm = None
-            if kind is TokenKind.BUNDLE:
-                nonterm = CFBundle.parse(tokens, debug)
-            elif kind is TokenKind.BODY:
-                nonterm = CFBody.parse(tokens, debug)
-            elif kind is TokenKind.PROMISE:
-                nonterm = CFPromise.parse(tokens, debug)
-            elif kind is TokenKind.COMMENT:
-                nonterm = CFCommentBlock.parse(tokens, debug)
-            elif kind is TokenKind.MACRO:
-                nonterm = CFMacro.parse(tokens, debug)
-            else:
-                policy.parser_error(
-                    tokens.current(),
-                    TokenKind.BUNDLE,
-                    TokenKind.BODY,
-                    TokenKind.PROMISE,
-                )
+        expect = {
+            tk.BUNDLE: CFBundle,
+            tk.BODY: CFBody,
+            tk.PROMISE: CFPromise,
+            tk.COMMENT: CFComment,
+            tk.MACRO: CFMacro,
+        }
 
-            policy._nonterms.append(nonterm)
+        policy.parse_while(tokens, debug, expect)
+
+        if tokens:
+            policy.parser_error(tokens.current(), expect.keys())
 
         policy.leave_parser()
         return policy
 
     def pretty_print(self, pp):
         last = None
-        for nonterm in self._nonterms:
-            if isinstance(last, (CFBundle, CFBody, CFPromise)):
+        first = True
+        while not self.empty():
+            this = self.pop()
+
+            if not first and not (
+                isinstance(last, CFComment)
+                and isinstance(this, CFComment)
+                and this.row() - last.row() == 1
+            ):
                 pp.println()
-            if isinstance(last, CFCommentBlock) and isinstance(nonterm, CFCommentBlock):
-                pp.println()
-            nonterm.pretty_print(pp)
-            last = nonterm
+            elif first:
+                first = False
+
+            this.pretty_print(pp)
+            pp.println()
+            last = this
+
         pp.println()

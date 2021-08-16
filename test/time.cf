@@ -8,7 +8,8 @@
 #
 #
 
-bundle #hello
+@ifdef
+bundle
 agent report_time(a, # comment
                      # comment
                      # comment
@@ -18,3 +19,10 @@ b, c)
   reports: # report stuff
     "Time is $(hours):$(minutes):$(seconds)";
 }
+
+bundle agent identifier
+{
+  reports:
+    "tjohei";
+}
+@endif

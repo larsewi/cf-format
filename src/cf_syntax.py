@@ -31,6 +31,40 @@ class CFSyntax(ABC):
         assert CFSyntax._indent >= 2
         CFSyntax._indent -= 2
 
+    def parse_or_error(self, tokens, debug, expect):
+        if tokens.current().kind() in expect.keys():
+            self.push(expect[tokens.current().kind()].parse(tokens, debug))
+        else:
+            self.parser_error(tokens.current(), expect.keys())
+
+    def parse_if(self, tokens, debug, expect):
+        if tokens.current().kind() in expect.keys():
+            self.push(expect[tokens.current().kind()].parse(tokens, debug))
+            return True
+        return False
+
+    def parse_while(self, tokens, debug, expect):
+        found = False
+        while tokens.current().kind() in expect.keys():
+            self.push(expect[tokens.current().kind()].parse(tokens, debug))
+            found = True
+        return found
+
+    def push(self, nonterm):
+        assert nonterm is not None
+        return self._nonterms.append(nonterm)
+
+    def pop(self):
+        return self._nonterms.pop(0)
+
+    def empty(self):
+        return False if self._nonterms else True
+
+    def peek(self):
+        if len(self._nonterms) > 1:
+            return self._nonterms[1]
+        return None
+
     def parser_error(self, found, *expected):
         eprint(
             f"There are syntax errors in policy file '{found.filename()}' on line {found.row() + 1}\n"

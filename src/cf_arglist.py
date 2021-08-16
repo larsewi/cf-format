@@ -1,9 +1,9 @@
-from cf_commentblock import CFCommentBlock
+from cf_comment import CFComment
 from cf_identifier import CFIdentifier
 from cf_macro import CFMacro
 from cf_syntax import CFSyntax
 from cf_misc import parse_while_comment_or_macro
-from token import TokenKind as TK
+from token import TokenKind as tk
 
 
 class CFArgList(CFSyntax):
@@ -16,39 +16,41 @@ class CFArgList(CFSyntax):
         arglist.enter_parser()
         nonterms = arglist._nonterms
 
-        tokens.skip(TK.LEFT_PAR)
-        last = TK.LEFT_PAR
+        tokens.skip(tk.LEFT_PAR)
+        last = tk.LEFT_PAR
 
         while tokens:
             # Argument
-            if tokens.current().kind() is TK.IDENTIFIER:
-                if last not in (TK.LEFT_PAR, TK.COMMA):
-                    arglist.parser_error(tokens.current(), TK.COMMA)
-                last = TK.IDENTIFIER
+            if tokens.current().kind() is tk.IDENTIFIER:
+                if last not in (tk.LEFT_PAR, tk.COMMA):
+                    arglist.parser_error(tokens.current(), tk.COMMA)
+                last = tk.IDENTIFIER
                 nonterms.append(CFIdentifier.parse(tokens, debug))
 
             # Comma
-            elif tokens.current().kind() is TK.COMMA:
-                if last is not TK.IDENTIFIER:
-                    arglist.parser_error(tokens.current(), TK.IDENTIFIER)
-                last = TK.COMMA
-                tokens.skip(TK.COMMA)
+            elif tokens.current().kind() is tk.COMMA:
+                if last is not tk.IDENTIFIER:
+                    arglist.parser_error(tokens.current(), tk.IDENTIFIER)
+                last = tk.COMMA
+                tokens.skip(tk.COMMA)
 
             # Right parentisis
-            elif tokens.current().kind() is TK.RIGHT_PAR:
-                if last is not TK.IDENTIFIER:
-                    arglist.parser_error(tokens.current(), TK.IDENTIFIER)
-                last = TK.RIGHT_PAR
-                tokens.skip(TK.RIGHT_PAR)
+            elif tokens.current().kind() is tk.RIGHT_PAR:
+                if last is not tk.IDENTIFIER:
+                    arglist.parser_error(tokens.current(), tk.IDENTIFIER)
+                last = tk.RIGHT_PAR
+                tokens.skip(tk.RIGHT_PAR)
                 break
 
             # Comments or macro
             else:
-                assert tokens.current().kind() in (TK.COMMENT, TK.MACRO)
-                parse_while_comment_or_macro(nonterms, tokens, debug)
+                arglist.parse_or_error(tokens, debug, {
+                    tk.COMMENT: CFComment,
+                    tk.MACRO: CFMacro
+                })
 
-        if last is not TK.RIGHT_PAR:
-            arglist.parser_error_empty(TK.LEFT_PAR)
+        if last is not tk.RIGHT_PAR:
+            arglist.parser_error_empty(tk.LEFT_PAR)
 
         arglist.leave_parser()
         return arglist

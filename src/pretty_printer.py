@@ -9,17 +9,12 @@ class PrettyPrinter:
         self._max_col = 80
 
     def print(self, string):
-        assert "\n" not in string
-
         col, _ = self._cursor
         if col == 0:
             self._file.write(bytes(self._indent, "utf-8"))
             col, row = self._cursor
             self._cursor = (col + len(self._indent), row)
-
-        self._file.write(bytes(string, "utf-8"))
-        col, row = self._cursor
-        self._cursor = (col + len(string), row)
+        self.print_no_indent(string)
 
     def println(self, string=""):
         assert "\n" not in string
@@ -30,10 +25,9 @@ class PrettyPrinter:
 
     def print_no_indent(self, string=""):
         assert "\n" not in string
-
-        _, row = self._cursor
-        self._file.write(bytes(string + "\n", "utf-8"))
-        self._cursor = (0, row + 1)
+        self._file.write(bytes(string, "utf-8"))
+        col, row = self._cursor
+        self._cursor = (len(string) + col, row)
 
     def truncate_to(self, cursor):
         new_col, new_row = self._cursor

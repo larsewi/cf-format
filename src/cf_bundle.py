@@ -1,11 +1,11 @@
+from ast import parse
 from cf_arglist import CFArgList
 from cf_bundlebody import CFBundleBody
-from cf_commentblock import CFCommentBlock
 from cf_identifier import CFIdentifier
+from cf_comment import CFComment
 from cf_macro import CFMacro
 from cf_syntax import CFSyntax
-from cf_misc import parse_while_comment_or_macro
-from token import TokenKind
+from token import TokenKind as tk
 
 
 class CFBundle(CFSyntax):
@@ -16,46 +16,54 @@ class CFBundle(CFSyntax):
     def parse(tokens, debug) -> CFSyntax:
         bundle = CFBundle(debug)
         bundle.enter_parser()
-        nonterms = bundle._nonterms
 
-        tokens.skip(TokenKind.BUNDLE)
+        tokens.skip(tk.BUNDLE)
 
-        parse_while_comment_or_macro(nonterms, tokens, debug)
+        # Parse comments and macros
+        bundle.parse_while(tokens, debug, {
+            tk.COMMENT: CFComment,
+            tk.MACRO: CFMacro
+        })
 
         # Parse bundletype
-        if tokens.current().kind() is not TokenKind.IDENTIFIER:
-            bundle.parser_error(tokens.current(), TokenKind.IDENTIFIER)
-        nonterms.append(CFIdentifier.parse(tokens, debug))
+        bundle.parse_or_error(tokens, debug, { tk.IDENTIFIER: CFIdentifier })
 
-        parse_while_comment_or_macro(nonterms, tokens, debug)
+        # Parse comments and macros
+        bundle.parse_while(tokens, debug, {
+            tk.COMMENT: CFComment,
+            tk.MACRO: CFMacro
+        })
 
         # Parse bundleid
-        if tokens.current().kind() is not TokenKind.IDENTIFIER:
-            bundle.parser_error(tokens.current(), TokenKind.IDENTIFIER)
-        nonterms.append(CFIdentifier.parse(tokens, debug))
+        bundle.parse_or_error(tokens, debug, { tk.IDENTIFIER: CFIdentifier })
 
-        parse_while_comment_or_macro(nonterms, tokens, debug)
+        # Parse comments and macros
+        bundle.parse_while(tokens, debug, {
+            tk.COMMENT: CFComment,
+            tk.MACRO: CFMacro
+        })
 
         # Parse arglist
-        if tokens.current().kind() is TokenKind.LEFT_PAR:
-            nonterms.append(CFArgList.parse(tokens, debug))
+        bundle.parse_if(tokens, debug, { tk.LEFT_PAR: CFArgList })
 
-        parse_while_comment_or_macro(nonterms, tokens, debug)
+        # Parse comments and macros
+        bundle.parse_while(tokens, debug, {
+            tk.COMMENT: CFComment,
+            tk.MACRO: CFMacro
+        })
 
         # Parse bundlebody
-        nonterms.append(CFBundleBody.parse(tokens, debug))
+        bundle.push(CFBundleBody.parse(tokens, debug))
 
         bundle.leave_parser()
         return bundle
 
     def pretty_print(self, pp):
-        nonterms = self._nonterms
-
         pp.print("bundle ")
 
         # Comment / macro
-        nonterm = nonterms.pop(0)
-        while isinstance(nonterm, (CFCommentBlock, CFMacro)):
+        nonterm = self.pop()
+        while isinstance(nonterm, (CFComment, CFMacro)):
             nonterm.pretty_print(pp)
             nonterm = nonterms.pop(0)
 
@@ -66,7 +74,7 @@ class CFBundle(CFSyntax):
         pp.print(" ")
 
         # Comment / macro
-        while isinstance(nonterm, (CFCommentBlock, CFMacro)):
+        while isinstance(nonterm, (CFComment, CFMacro)):
             nonterm.pretty_print(pp)
             nonterms.pop(0)
 
@@ -79,7 +87,7 @@ class CFBundle(CFSyntax):
             pp.println()
 
         # Comment / macro
-        while isinstance(nonterm, (CFCommentBlock, CFMacro)):
+        while isinstance(nonterm, (CFComment, CFMacro)):
             nonterm.pretty_print(pp)
             nonterm = nonterms.pop(0)
 
@@ -90,7 +98,7 @@ class CFBundle(CFSyntax):
             pp.println()
 
         # Comment / macro
-        while isinstance(nonterm, (CFCommentBlock, CFMacro)):  # glekki,  # glekki
+        while isinstance(nonterm, (CFComment, CFMacro)):  # glekki,  # glekki
             nonterm.pretty_print(pp)
             nonterm = nonterms.pop(0)
 
