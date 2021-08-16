@@ -44,10 +44,9 @@ class CFArgList(CFSyntax):
 
             # Comments or macro
             else:
-                arglist.parse_or_error(tokens, debug, {
-                    tk.COMMENT: CFComment,
-                    tk.MACRO: CFMacro
-                })
+                arglist.parse_or_error(
+                    tokens, debug, {tk.COMMENT: CFComment, tk.MACRO: CFMacro}
+                )
 
         if last is not tk.RIGHT_PAR:
             arglist.parser_error_empty(tk.LEFT_PAR)

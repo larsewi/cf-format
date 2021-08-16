@@ -4,10 +4,7 @@ from token import TokenKind as TK
 
 
 def parse_while_comment_or_macro(self, tokens, debug):
-    while tokens and tokens.current().kind() in (
-        TK.COMMENT,
-        TK.MACRO,
-    ):
+    while tokens and tokens.current().kind() in (TK.COMMENT, TK.MACRO,):
         if tokens.current().kind() is TK.COMMENT:
             self.push(CFComment.parse(tokens, debug))
         else:

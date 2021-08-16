@@ -45,8 +45,8 @@ class CFBundleStatement(CFSyntax):
     def pretty_print(self, pp):
         pp.indent()
 
-        nonterm = self._nonterms.pop(0)
+        nonterm = self.pop()
         if isinstance(nonterm, CFPromiseGuard):
             nonterm.pretty_print(pp)
             pp.println()
-            nonterm = nonterm.pop(0)
+            nonterm = self.pop()

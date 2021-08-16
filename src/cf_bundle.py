@@ -1,4 +1,3 @@
-from ast import parse
 from cf_arglist import CFArgList
 from cf_bundlebody import CFBundleBody
 from cf_identifier import CFIdentifier
@@ -20,37 +19,25 @@ class CFBundle(CFSyntax):
         tokens.skip(tk.BUNDLE)
 
         # Parse comments and macros
-        bundle.parse_while(tokens, debug, {
-            tk.COMMENT: CFComment,
-            tk.MACRO: CFMacro
-        })
+        bundle.parse_while(tokens, debug, {tk.COMMENT: CFComment, tk.MACRO: CFMacro})
 
         # Parse bundletype
-        bundle.parse_or_error(tokens, debug, { tk.IDENTIFIER: CFIdentifier })
+        bundle.parse_or_error(tokens, debug, {tk.IDENTIFIER: CFIdentifier})
 
         # Parse comments and macros
-        bundle.parse_while(tokens, debug, {
-            tk.COMMENT: CFComment,
-            tk.MACRO: CFMacro
-        })
+        bundle.parse_while(tokens, debug, {tk.COMMENT: CFComment, tk.MACRO: CFMacro})
 
         # Parse bundleid
-        bundle.parse_or_error(tokens, debug, { tk.IDENTIFIER: CFIdentifier })
+        bundle.parse_or_error(tokens, debug, {tk.IDENTIFIER: CFIdentifier})
 
         # Parse comments and macros
-        bundle.parse_while(tokens, debug, {
-            tk.COMMENT: CFComment,
-            tk.MACRO: CFMacro
-        })
+        bundle.parse_while(tokens, debug, {tk.COMMENT: CFComment, tk.MACRO: CFMacro})
 
         # Parse arglist
-        bundle.parse_if(tokens, debug, { tk.LEFT_PAR: CFArgList })
+        bundle.parse_if(tokens, debug, {tk.LEFT_PAR: CFArgList})
 
         # Parse comments and macros
-        bundle.parse_while(tokens, debug, {
-            tk.COMMENT: CFComment,
-            tk.MACRO: CFMacro
-        })
+        bundle.parse_while(tokens, debug, {tk.COMMENT: CFComment, tk.MACRO: CFMacro})
 
         # Parse bundlebody
         bundle.push(CFBundleBody.parse(tokens, debug))
@@ -59,29 +46,30 @@ class CFBundle(CFSyntax):
         return bundle
 
     def pretty_print(self, pp):
+        pass
         pp.print("bundle ")
 
         # Comment / macro
         nonterm = self.pop()
         while isinstance(nonterm, (CFComment, CFMacro)):
             nonterm.pretty_print(pp)
-            nonterm = nonterms.pop(0)
+            nonterm = self.pop()
 
         # Bundletype
         assert isinstance(nonterm, CFIdentifier)
         nonterm.pretty_print(pp)
-        nonterm = nonterms.pop(0)
+        nonterm = self.pop()
         pp.print(" ")
 
         # Comment / macro
         while isinstance(nonterm, (CFComment, CFMacro)):
             nonterm.pretty_print(pp)
-            nonterms.pop(0)
+            nonterm = self.pop()
 
         # Bundleid
         assert isinstance(nonterm, CFIdentifier)
         nonterm.pretty_print(pp)
-        nonterm = nonterms.pop(0)
+        nonterm = self.pop()
 
         if not isinstance(nonterm, CFArgList):
             pp.println()
@@ -89,18 +77,18 @@ class CFBundle(CFSyntax):
         # Comment / macro
         while isinstance(nonterm, (CFComment, CFMacro)):
             nonterm.pretty_print(pp)
-            nonterm = nonterms.pop(0)
+            nonterm = self.pop(0)
 
         # Arglist
         if isinstance(nonterm, CFArgList):
             nonterm.pretty_print(pp)
-            nonterm = nonterms.pop(0)
+            nonterm = self.pop()
             pp.println()
 
         # Comment / macro
-        while isinstance(nonterm, (CFComment, CFMacro)):  # glekki,  # glekki
+        while isinstance(nonterm, (CFComment, CFMacro)):
             nonterm.pretty_print(pp)
-            nonterm = nonterms.pop(0)
+            nonterm = self.pop()
 
         # Bundlebody
         assert isinstance(nonterm, CFBundleBody)

@@ -38,14 +38,14 @@ class CFSyntax(ABC):
             self.parser_error(tokens.current(), expect.keys())
 
     def parse_if(self, tokens, debug, expect):
-        if tokens.current().kind() in expect.keys():
+        if tokens and tokens.current().kind() in expect.keys():
             self.push(expect[tokens.current().kind()].parse(tokens, debug))
             return True
         return False
 
     def parse_while(self, tokens, debug, expect):
         found = False
-        while tokens.current().kind() in expect.keys():
+        while tokens and tokens.current().kind() in expect.keys():
             self.push(expect[tokens.current().kind()].parse(tokens, debug))
             found = True
         return found
