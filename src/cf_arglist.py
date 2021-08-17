@@ -14,7 +14,6 @@ class CFArgList(CFSyntax):
     def parse(tokens, debug) -> CFSyntax:
         arglist = CFArgList(debug)
         arglist.enter_parser()
-        nonterms = arglist._nonterms
 
         tokens.skip(tk.LEFT_PAR)
         last = tk.LEFT_PAR
