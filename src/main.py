@@ -15,7 +15,12 @@ def main():
 
         pp = PrettyPrinter(config.debug == "printer")
         policy.pretty_print(pp)
-        print(pp)
+
+        if config.debug == "printer":
+            output = pp.__str__().replace(" ", "·")
+            print(output)
+
+        # TODO: Write result to output file
 
 
 def parse_arguments():
