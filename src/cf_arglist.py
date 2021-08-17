@@ -57,54 +57,122 @@ class CFArgList(CFSyntax):
     def pretty_print(self, pp):
         if self.empty():
             return
+
+        # In case we need to retry
         nonterms = self._nonterms.copy()
+        cursor = pp.get_cursor()
 
-        pp.print("(")
+        # Try no wrap
+        if not self._no_wrap(pp):
+            # Restore state
+            self._nonterms = nonterms.copy()
+            pp.truncate_to(cursor)
 
-        if self._no_wrap_failed(pp):
-            pp.println()
-            pp.indent()
-            if self._no_wrap_failed(pp):
+            # Try single wrap
+            if not self._single_wrap(pp):
+                # Restore state
+                self._nonterms = nonterms
+                pp.truncate_to(cursor)
+
+                # Last resort, do full wrap
                 self._full_wrap(pp)
-            pp.dedent()
-            pp.println()
-        pp.print(")")
 
-    def _no_wrap_failed(self, pp):
-        old_cursor = pp.get_cursor()
-        first = True
+    def _no_wrap(self, pp):
+        stash = []
+        pp.print("(")
+        num_ids = len([id for id in self._nonterms if isinstance(id, CFIdentifier)])
 
-        for nonterm in self._nonterms:
-            if not isinstance(nonterm, CFIdentifier):
-                pp.truncate_to(old_cursor)
-                return True
+        while not self.empty():
+            this = self.pop()
 
-            if first:
-                first = False
+            if isinstance(this, CFMacro):
+                return False
+            elif isinstance(this, CFComment):
+                stash.append(this)
             else:
-                pp.print(", ")
+                assert isinstance(this, CFIdentifier)
+                this.pretty_print(pp)
+                if num_ids > 1:
+                    pp.print(", ")
+                num_ids -= 1
 
-            nonterm.pretty_print(pp)
+        pp.print(")")
+        if pp.should_wrap():
+            return False
 
-            if pp.should_wrap(1):
-                pp.truncate_to(old_cursor)
-                return True
+        for comment in stash:
+            pp.print("  ")
+            comment.pretty_print(pp)
 
-        return False
+        return True
+
+    def _single_wrap(self, pp):
+        stash = []
+        pp.println("(")
+        pp.indent()
+        num_ids = len([id for id in self._nonterms if isinstance(id, CFIdentifier)])
+
+        while not self.empty():
+            this = self.pop()
+
+            if isinstance(this, CFMacro):
+                pp.dedent()
+                return False
+            elif isinstance(this, CFComment):
+                stash.append(this)
+            else:
+                assert isinstance(this, CFIdentifier)
+                this.pretty_print(pp)
+                if num_ids > 1:
+                    pp.print(", ")
+                num_ids -= 1
+
+        if pp.should_wrap():
+            pp.dedent()
+            return False
+
+        pp.println()
+        pp.dedent()
+        pp.print(")")
+        for comment in stash:
+            pp.print("  ")
+            comment.pretty_print(pp)
+
+        return True
 
     def _full_wrap(self, pp):
-        num_id = len([id for id in self._nonterms if isinstance(id, CFIdentifier)])
+        stash = []
+        pp.println("(")
+        pp.indent()
+        num_ids = len([id for id in self._nonterms if isinstance(id, CFIdentifier)])
 
-        first = True
-        last = None
-        for nonterm in self._nonterms:
-            if first:
-                first = False
-            elif isinstance(nonterm, CFIdentifier) and isinstance(last, CFIdentifier):
+        while not self.empty():
+            this = self.pop()
+
+            if isinstance(this, CFMacro):
+                this.pretty_print(pp)
                 pp.println()
-            nonterm.pretty_print(pp)
-            if isinstance(nonterm, CFIdentifier):
-                if num_id > 1:
+            elif isinstance(this, CFComment):
+                stash.append(this)
+            else:
+                assert isinstance(this, CFIdentifier)
+                this.pretty_print(pp)
+                if num_ids > 1:
                     pp.print(",")
-                num_id -= 1
-            last = nonterm
+                num_ids -= 1
+
+                while isinstance(self.peek(), CFComment):
+                    if num_ids == 0:
+                        pp.print("   ")
+                    else:
+                        pp.print("  ")
+                    self.pop().pretty_print(pp)
+                
+                pp.println()
+        
+        pp.dedent()
+        pp.print(")")
+
+        for comment in stash:
+            pp.print("  ")
+            comment.pretty_print(pp)

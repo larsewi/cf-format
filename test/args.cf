@@ -19,3 +19,47 @@ bundle agent single_wrap(super_long_argument, super_long_argument, super_long_ar
 bundle agent full_wrap(super_duper_long_argument, super_duper_long_argument, super_duper_long_argument)
 {
 }
+
+bundle agent no_wrap_comment(
+    short_arg, # comment 1
+    short_arg, # comment 2
+    short_arg  # comment 3
+)
+{
+}
+
+bundle agent single_wrap_comment(
+    super_long_argument, # comment 1
+    super_long_argument, # comment 2
+    super_long_argument  # comment 3
+)
+{
+}
+
+bundle agent full_wrap_comment(
+    super_duper_long_argument, # comment 1
+    super_duper_long_argument, # comment 2
+    super_duper_long_argument  # comment 3
+)
+{
+}
+
+bundle agent macro(
+@if minimum_version(3.8)
+    arg1,
+@endif
+    arg2,
+    arg3
+)
+{
+}
+
+bundle agent macro_and_comment( # hello gekko
+@if minimum_version(3.8)
+    arg1, # comment 1
+@endif
+    arg2, # comment 2
+    arg3  # comment 3
+)
+{
+}

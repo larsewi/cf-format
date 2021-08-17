@@ -50,5 +50,3 @@ class CFPolicy(CFSyntax):
             this.pretty_print(pp)
             pp.println()
             last = this
-
-        pp.println()
