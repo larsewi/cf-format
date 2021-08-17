@@ -36,7 +36,7 @@ class CFArgList(CFSyntax):
 
             # Right parentisis
             elif tokens.current().kind() is tk.RIGHT_PAR:
-                if last is not tk.IDENTIFIER:
+                if last not in (tk.IDENTIFIER, tk.LEFT_PAR):
                     arglist.parser_error(tokens.current(), tk.IDENTIFIER)
                 last = tk.RIGHT_PAR
                 tokens.skip(tk.RIGHT_PAR)
@@ -55,6 +55,8 @@ class CFArgList(CFSyntax):
         return arglist
 
     def pretty_print(self, pp):
+        if self.empty():
+            return
         nonterms = self._nonterms.copy()
 
         pp.print("(")
