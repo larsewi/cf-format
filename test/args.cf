@@ -1,0 +1,21 @@
+# Some policy file
+
+bundle agent no_args
+{
+}
+
+bundle agent empty_args()
+{
+}
+
+bundle agent no_wrap(short_arg, short_arg, short_arg)
+{
+}
+
+bundle agent single_wrap(super_long_argument, super_long_argument, super_long_argument)
+{
+}
+
+bundle agent full_wrap(super_duper_long_argument, super_duper_long_argument, super_duper_long_argument)
+{
+}

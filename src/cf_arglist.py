@@ -25,7 +25,7 @@ class CFArgList(CFSyntax):
                 if last not in (tk.LEFT_PAR, tk.COMMA):
                     arglist.parser_error(tokens.current(), tk.COMMA)
                 last = tk.IDENTIFIER
-                nonterms.append(CFIdentifier.parse(tokens, debug))
+                arglist.push(CFIdentifier.parse(tokens, debug))
 
             # Comma
             elif tokens.current().kind() is tk.COMMA:
@@ -55,6 +55,8 @@ class CFArgList(CFSyntax):
         return arglist
 
     def pretty_print(self, pp):
+        nonterms = self._nonterms.copy()
+
         pp.print("(")
 
         if self._no_wrap_failed(pp):

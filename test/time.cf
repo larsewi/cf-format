@@ -1,7 +1,0 @@
-# This is an ugly policy file
-bundle agent report_time(a, b, c) #4
-# comment
-{
-  reports:
-    "Time is $(hours):$(minutes):$(seconds)";
-}
