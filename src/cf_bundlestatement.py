@@ -1,8 +1,9 @@
+from cf_macro import CFMacro
 from cf_promiseguard import CFPromiseGuard
 from cf_promiseline import CFPromiseLine
 from cf_syntax import CFSyntax
 from cf_comment import CFComment
-from token import TokenKind
+from token import TokenKind as tk
 
 
 class CFBundleStatement(CFSyntax):
@@ -13,40 +14,40 @@ class CFBundleStatement(CFSyntax):
     def parse(tokens, debug) -> CFSyntax:
         bundlestatement = CFBundleStatement(debug)
         bundlestatement.enter_parser()
-        nonterms = bundlestatement._nonterms
 
         # Parse promiseguard
-        current = tokens.current()
-        if current.kind() is not TokenKind.PROMISE_GUARD:
-            bundlestatement.parser_error(current, TokenKind.PROMISE_GUARD)
-        promiseguard = CFPromiseGuard.parse(tokens, debug)
-        assert promiseguard is not None
-        nonterms.append(promiseguard)
+        bundlestatement.parse_or_error(
+            tokens, debug, {tk.PROMISE_GUARD: CFPromiseGuard}
+        )
 
-        while tokens.current().kind() in (
-            TokenKind.CLASS_GUARD,
-            TokenKind.QUOTED_STRING,
-            TokenKind.COMMENT,
-        ):
-            if tokens.current().kind() is TokenKind.COMMENT:
-                # Parse comment
-                comment = CFComment.parse(tokens, debug)
-                assert comment is not None
-                nonterms.append(comment)
-            else:
-                # Parse promiseline
-                promiseline = CFPromiseLine.parse(tokens, debug)
-                assert promiseline is not None
-                nonterms.append(promiseline)
+        # Parse promiselines, comments and macros
+        bundlestatement.parse_while(
+            tokens,
+            debug,
+            {
+                tk.CLASS_GUARD: CFPromiseLine,
+                tk.QUOTED_STRING: CFPromiseLine,
+                tk.COMMENT: CFComment,
+                tk.MACRO: CFMacro,
+            },
+        )
 
         bundlestatement.leave_parser()
         return bundlestatement
 
     def pretty_print(self, pp):
-        pp.indent()
+        while not self.empty():
+            this = self.pop()
 
-        nonterm = self.pop()
-        if isinstance(nonterm, CFPromiseGuard):
-            nonterm.pretty_print(pp)
-            pp.println()
-            nonterm = self.pop()
+            if isinstance(this, CFPromiseGuard):
+                this.pretty_print(pp)
+                pp.println()
+            elif isinstance(this, CFComment):
+                this.pretty_print(pp)
+            elif isinstance(this, CFMacro):
+                pp.println()
+                this.pretty_print(pp)
+                pp.println()
+            else:
+                assert isinstance(this, CFPromiseLine)
+                this.pretty_print(pp)

@@ -1,9 +1,10 @@
 from cf_classguard import CFClassGuard
 from cf_comment import CFComment
+from cf_macro import CFMacro
 from cf_syntax import CFSyntax
 from cf_quotedstring import CFQuotedString
 from cf_constraint import CFConstraint
-from token import TokenKind
+from token import TokenKind as tk
 
 
 class CFPromiseLine(CFSyntax):
@@ -14,50 +15,32 @@ class CFPromiseLine(CFSyntax):
     def parse(tokens, debug) -> CFSyntax:
         promiseline = CFPromiseLine(debug)
         promiseline.enter_parser()
-        nonterms = promiseline._nonterms
 
-        # Parse classguard if any
-        if tokens.current().kind() is TokenKind.CLASS_GUARD:
-            classguard = CFClassGuard.parse(tokens, debug)
-            assert classguard is not None
-            nonterms.append(classguard)
+        # Parse classguard
+        promiseline.parse_if(tokens, debug, { tk.CLASS_GUARD: CFClassGuard })
 
-        # Parse comments if any
-        while tokens.current().kind() is TokenKind.COMMENT:
-            comment = CFComment.parse(tokens, debug)
-            assert comment is not None
-            nonterms.append(comment)
+        # Parse comments and macros
+        promiseline.parse_while(tokens, debug, { tk.COMMENT: CFComment, tk.MACRO: CFMacro })
 
         # Parse promiser
-        current = tokens.current()
-        if current.kind() is not TokenKind.QUOTED_STRING:
-            promiseline.parser_error(current, TokenKind.QUOTED_STRING)
-        promiser = CFQuotedString.parse(tokens, debug)
-        assert promiser is not None
-        nonterms.append(promiser)
+        promiseline.parse_or_error(tokens, debug, { tk.QUOTED_STRING: CFQuotedString })
 
         # Parse promisee
-        current = tokens.current()
-        if current.kind() is TokenKind.THIN_ARROW:
-            # TODO: Implement promisee, what ever that is ?
-            pass
+        promiseline.parse_if(tokens, debug, { tk.THIN_ARROW: None }) # TODO
 
         # Parse constraints
-        current = tokens.current()
-        while current.kind() is not TokenKind.SEMICOLON:
-            constraint = CFConstraint.parse(tokens, debug)
-            nonterms.append(constraint)
+        while tokens and tokens.current().kind() is not tk.SEMICOLON:
+            promiseline.push(CFConstraint.parse(tokens, debug))
 
-            current = tokens.current()
-            if current.kind() is TokenKind.COMMA:
-                tokens.skip(TokenKind.COMMA)
-                current = tokens.current()
+            if tokens and tokens.current().kind() not in (tk.COMMA, tk.SEMICOLON):
+                promiseline.parser_error(tokens.current(), tk.COMMA, tk.SEMICOLON)
             else:
-                break
+                if tokens and tokens.current().kind() is tk.COMMA:
+                    tokens.skip(tk.COMMA)
 
-        if current.kind() is not TokenKind.SEMICOLON:
-            promiseline.parser_error(current, TokenKind.COMMA, TokenKind.SEMICOLON)
-        tokens.skip(TokenKind.SEMICOLON)
+        if not tokens and tokens.current().kind() is not tk.SEMICOLON:
+            promiseline.parser_error(tokens.current(), tk.COMMA, tk.SEMICOLON)
+        tokens.skip(tk.SEMICOLON)
 
         promiseline.leave_parser()
         return promiseline

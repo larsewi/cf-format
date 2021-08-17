@@ -25,7 +25,8 @@ def main():
 
 def parse_arguments():
     arg_parser = argparse.ArgumentParser(
-        description="Simple CFEngine policy formatting tool", epilog="Jeez Louise ...",
+        description="Simple CFEngine policy formatting tool",
+        epilog="Jeez Louise ...",
     )
     arg_parser.add_argument(
         "-d",

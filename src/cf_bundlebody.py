@@ -1,7 +1,8 @@
 from cf_bundlestatement import CFBundleStatement
 from cf_comment import CFComment
+from cf_macro import CFMacro
 from cf_syntax import CFSyntax
-from token import TokenKind
+from token import TokenKind as tk
 
 
 class CFBundleBody(CFSyntax):
@@ -12,37 +13,36 @@ class CFBundleBody(CFSyntax):
     def parse(tokens, debug) -> CFSyntax:
         bundlebody = CFBundleBody(debug)
         bundlebody.enter_parser()
-        nonterms = bundlebody._nonterms
 
         # Skip left brace
         current = tokens.current()
-        if current.kind() is not TokenKind.LEFT_BRACE:
-            bundlebody.parser_error(current, TokenKind.LEFT_BRACE)
-        tokens.skip(TokenKind.LEFT_BRACE)
+        if current.kind() is not tk.LEFT_BRACE:
+            bundlebody.parser_error(current, tk.LEFT_BRACE)
+        tokens.skip(tk.LEFT_BRACE)
 
-        while tokens.current().kind() in (TokenKind.PROMISE_GUARD, TokenKind.COMMENT):
-            if tokens.current().kind() is TokenKind.COMMENT:
-                # Parse comment
-                comment = CFComment.parse(tokens, debug)
-                assert comment is not None
-                nonterms.append(comment)
-            else:
-                # Parse bundlestatement
-                bundlestatement = CFBundleStatement.parse(tokens, debug)
-                assert bundlestatement is not None
-                nonterms.append(bundlestatement)
+        while tokens and tokens.current().kind() is not tk.RIGHT_BRACE:
+            bundlebody.parse_or_error(
+                tokens,
+                debug,
+                {
+                    tk.PROMISE_GUARD: CFBundleStatement,
+                    tk.COMMENT: CFComment,
+                    tk.MACRO: CFMacro,
+                },
+            )
 
         # skip right brace
-        current = tokens.current()
-        if current.kind() is not TokenKind.RIGHT_BRACE:
-            bundlebody.parser_error(current, TokenKind.RIGHT_BRACE)
-        tokens.skip(TokenKind.RIGHT_BRACE)
+        if not tokens or tokens.current().kind() is not tk.RIGHT_BRACE:
+            bundlebody.parser_error(tokens.current(), tk.RIGHT_BRACE)
+        tokens.skip(tk.RIGHT_BRACE)
 
         bundlebody.leave_parser()
         return bundlebody
 
     def pretty_print(self, pp):
         pp.println("{")
-        for nonterm in self._nonterms:
-            nonterm.pretty_print(pp)
+        pp.indent()
+        while not self.empty():
+            self.pop().pretty_print(pp)
+        pp.dedent()
         pp.print("}")

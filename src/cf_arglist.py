@@ -2,7 +2,6 @@ from cf_comment import CFComment
 from cf_identifier import CFIdentifier
 from cf_macro import CFMacro
 from cf_syntax import CFSyntax
-from cf_misc import parse_while_comment_or_macro
 from token import TokenKind as tk
 
 
@@ -166,9 +165,9 @@ class CFArgList(CFSyntax):
                     else:
                         pp.print("  ")
                     self.pop().pretty_print(pp)
-                
+
                 pp.println()
-        
+
         pp.dedent()
         pp.print(")")
 

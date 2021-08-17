@@ -43,8 +43,8 @@ class PrettyPrinter:
 
     def truncate_to(self, cursor):
         row, col = cursor
-        self._strlst = self._strlst[: row]
-        self._strlst[-1] = self._strlst[-1][: col]
+        self._strlst = self._strlst[:row]
+        self._strlst[-1] = self._strlst[-1][:col]
 
         self._log_debug()
 
