@@ -17,6 +17,7 @@ def main():
         policy.pretty_print(pp)
 
         if config.debug == "printer":
+            print("*************************")
             output = pp.__str__().replace(" ", "·")
             print(output)
 

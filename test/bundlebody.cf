@@ -1,6 +1,9 @@
 bundle agent bb(arg1, arg2, arg3)
 {
-    reports:
-        any::
-            "Hello Gekko!";
+    # This is a bundle statement
+    reports: # Report stuff
+        # This is a class guard
+        any:: # Applicable for all
+            # This is a promiser
+            "Hello Gekko!"; # Write a welcoming message to our dear friend Gekko
 }

@@ -36,18 +36,19 @@ class CFBundleStatement(CFSyntax):
         return bundlestatement
 
     def pretty_print(self, pp):
-        while not self.empty():
-            this = self.pop()
+        promiseguard = self.pop()
+        assert isinstance(promiseguard, CFPromiseGuard)
+        promiseguard.pretty_print(pp)
 
-            if isinstance(this, CFPromiseGuard):
-                this.pretty_print(pp)
-                pp.println()
-            elif isinstance(this, CFComment):
-                this.pretty_print(pp)
-            elif isinstance(this, CFMacro):
-                pp.println()
-                this.pretty_print(pp)
-                pp.println()
-            else:
-                assert isinstance(this, CFPromiseLine)
-                this.pretty_print(pp)
+        if isinstance(self.peek(), CFComment) and self.peek().row() == promiseguard.row():
+            pp.print("  ")
+            self.pop().pretty_print(pp)
+
+        pp.indent()
+        pp.println()
+
+        while not self.empty():
+            self.pop().pretty_print(pp)
+            pp.println()
+
+        pp.dedent()

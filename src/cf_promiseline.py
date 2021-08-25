@@ -40,10 +40,44 @@ class CFPromiseLine(CFSyntax):
 
         if not tokens and tokens.current().kind() is not tk.SEMICOLON:
             promiseline.parser_error(tokens.current(), tk.COMMA, tk.SEMICOLON)
-        tokens.skip(tk.SEMICOLON)
+        skipped = tokens.skip(tk.SEMICOLON)
+
+        # Parse trailing comment
+        if tokens and tokens.current().kind() is tk.COMMENT and tokens.current().row() == skipped.row():
+            promiseline.push(CFComment.parse(tokens, debug))
 
         promiseline.leave_parser()
         return promiseline
 
-    def pretty_print(self, pretty):
-        pass
+    def pretty_print(self, pp):
+        if isinstance(self.peek(), CFClassGuard):
+            classguard = self.pop()
+            classguard.pretty_print(pp)
+
+            if isinstance(self.peek(), CFComment) and self.peek().row() == classguard.row():
+                pp.print("  ")
+                self.pop().pretty_print(pp)
+
+            pp.println()
+
+        pp.indent()
+
+        while isinstance(self.peek(), (CFComment, CFMacro)):
+            self.pop().pretty_print(pp)
+            pp.println()
+
+        promiser = self.pop()
+        assert isinstance(promiser, CFQuotedString)
+        promiser.pretty_print(pp)
+
+        # TODO promisee
+        # TODO constraints
+
+        pp.print(";")
+        if not self.empty():
+            trailing_comment = self.pop()
+            assert isinstance(trailing_comment, CFComment)
+            pp.print("  ")
+            trailing_comment.pretty_print(pp)
+
+        pp.dedent()

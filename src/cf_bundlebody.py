@@ -44,5 +44,6 @@ class CFBundleBody(CFSyntax):
         pp.indent()
         while not self.empty():
             self.pop().pretty_print(pp)
+            pp.println()
         pp.dedent()
         pp.print("}")
