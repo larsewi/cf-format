@@ -1,6 +1,7 @@
 from cf_identifier import CFIdentifier
+from cf_rval import CFRval
 from cf_syntax import CFSyntax
-from token import TokenKind
+from token import TokenKind as tk
 
 
 class CFConstraint(CFSyntax):
@@ -12,19 +13,17 @@ class CFConstraint(CFSyntax):
         constraint = CFConstraint(debug)
         constraint.enter_parser()
 
-        current = tokens.current()
-        if current.kind() is not TokenKind.IDENTIFIER:
-            constraint.parser_error(current, TokenKind.IDENTIFIER)
-        constraint_id = CFIdentifier.parse(tokens, debug)
-        constraint._nonterms.append(constraint_id)
+        constraint.parse_or_error(tokens, debug, {tk.IDENTIFIER: CFIdentifier})
 
         current = tokens.current()
-        if current.kind() is not TokenKind.FAT_ARROW:
-            constraint.parser_error(current, TokenKind.FAT_ARROW)
-        tokens.skip(TokenKind.FAT_ARROW)
+        if current.kind() is not tk.FAT_ARROW:
+            constraint.parser_error(current, tk.FAT_ARROW)
+        tokens.skip(tk.FAT_ARROW)
+
+        constraint.push(CFRval.parse(tokens, debug))
 
         constraint.leave_parser()
         return constraint
 
-    def pretty_print(self, pretty):
+    def pretty_print(self, pp):
         pass
