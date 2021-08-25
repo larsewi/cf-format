@@ -26,4 +26,12 @@ class CFConstraint(CFSyntax):
         return constraint
 
     def pretty_print(self, pp):
-        pass
+        identifier = self.pop()
+        identifier.pretty_print(pp)
+
+        pp.print(" ")
+        pp.print("=>")
+        pp.print(" ")
+
+        rval = self.pop()
+        rval.pretty_print(pp)

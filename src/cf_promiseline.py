@@ -85,8 +85,25 @@ class CFPromiseLine(CFSyntax):
         assert isinstance(promiser, CFQuotedString)
         promiser.pretty_print(pp)
 
-        # TODO promisee
-        # TODO constraints
+        # Print stakeholder
+        if isinstance(self.peek(), CFRval):
+            pp.print(" ")
+            pp.print("->")
+            pp.print(" ")
+            self.pop().pretty_print(pp)
+
+        # Print constraints
+        first = True
+        while isinstance(self.peek(), CFConstraint):
+            if first:
+                first = False
+            else:
+                pp.print(",")
+
+            pp.indent()
+            pp.println()
+            self.pop().pretty_print(pp)
+            pp.dedent()
 
         pp.print(";")
         if not self.empty():

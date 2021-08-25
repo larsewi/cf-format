@@ -31,4 +31,4 @@ class CFRval(CFSyntax):
         return rval
 
     def pretty_print(self, pp):
-        pass
+        self.pop().pretty_print(pp)
