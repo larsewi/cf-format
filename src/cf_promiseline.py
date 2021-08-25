@@ -4,6 +4,7 @@ from cf_macro import CFMacro
 from cf_syntax import CFSyntax
 from cf_quotedstring import CFQuotedString
 from cf_constraint import CFConstraint
+from cf_rval import CFRval
 from token import TokenKind as tk
 
 
@@ -17,16 +18,23 @@ class CFPromiseLine(CFSyntax):
         promiseline.enter_parser()
 
         # Parse classguard
-        promiseline.parse_if(tokens, debug, { tk.CLASS_GUARD: CFClassGuard })
+        promiseline.parse_if(tokens, debug, {tk.CLASS_GUARD: CFClassGuard})
 
         # Parse comments and macros
-        promiseline.parse_while(tokens, debug, { tk.COMMENT: CFComment, tk.MACRO: CFMacro })
+        promiseline.parse_while(
+            tokens, debug, {tk.COMMENT: CFComment, tk.MACRO: CFMacro}
+        )
 
         # Parse promiser
-        promiseline.parse_or_error(tokens, debug, { tk.QUOTED_STRING: CFQuotedString })
+        promiseline.parse_or_error(tokens, debug, {tk.QUOTED_STRING: CFQuotedString})
 
         # Parse promisee
-        promiseline.parse_if(tokens, debug, { tk.THIN_ARROW: None }) # TODO
+        if tokens.current().kind() is tk.THIN_ARROW:
+            tokens.skip(tk.THIN_ARROW)
+            promiseline.parse_while(
+                tokens, debug, {tk.COMMENT: CFComment, tk.MACRO: CFMacro}
+            )
+            promiseline.push(CFRval.parse(tokens, debug))
 
         # Parse constraints
         while tokens and tokens.current().kind() is not tk.SEMICOLON:
@@ -43,7 +51,11 @@ class CFPromiseLine(CFSyntax):
         skipped = tokens.skip(tk.SEMICOLON)
 
         # Parse trailing comment
-        if tokens and tokens.current().kind() is tk.COMMENT and tokens.current().row() == skipped.row():
+        if (
+            tokens
+            and tokens.current().kind() is tk.COMMENT
+            and tokens.current().row() == skipped.row()
+        ):
             promiseline.push(CFComment.parse(tokens, debug))
 
         promiseline.leave_parser()
@@ -54,7 +66,10 @@ class CFPromiseLine(CFSyntax):
             classguard = self.pop()
             classguard.pretty_print(pp)
 
-            if isinstance(self.peek(), CFComment) and self.peek().row() == classguard.row():
+            if (
+                isinstance(self.peek(), CFComment)
+                and self.peek().row() == classguard.row()
+            ):
                 pp.print("  ")
                 self.pop().pretty_print(pp)
 

@@ -1,5 +1,10 @@
+from cf_function import CFFunction
+from cf_list import CFList
+from cf_nakedvar import CFNakedVar
+from cf_quotedstring import CFQuotedString
 from cf_syntax import CFSyntax
-from token import TokenKind
+from cf_identifier import CFIdentifier
+from token import TokenKind as tk
 
 
 class CFRval(CFSyntax):
@@ -11,28 +16,19 @@ class CFRval(CFSyntax):
         rval = CFRval(debug)
         rval.enter_parser()
 
-        current = tokens.current()
-        if current.kind() is TokenKind.IDENTIFIER:
-            # TODO: function
-            pass
-        elif current.kind() is TokenKind.QUOTED_STRING:
-            # TODO: quoted string
-            pass
-        elif current.kind() is TokenKind.NAKED_VAR:
-            pass
-        elif current.kind() is TokenKind.LEFT_PAR:
-            pass
-        else:
-            rval.parser_error(
-                current,
-                TokenKind.IDENTIFIER,
-                TokenKind.QUOTED_STRING,
-                TokenKind.NAKED_VAR,
-                TokenKind.LEFT_PAR,
-            )
+        rval.parse_or_error(
+            tokens,
+            debug,
+            {
+                tk.IDENTIFIER: CFFunction,
+                tk.QUOTED_STRING: CFQuotedString,
+                tk.NAKED_VAR: CFNakedVar,
+                tk.LEFT_BRACE: CFList,
+            },
+        )
 
         rval.leave_parser()
         return rval
 
-    def pretty_print(self, pretty):
+    def pretty_print(self, pp):
         pass

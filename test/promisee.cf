@@ -2,5 +2,6 @@ bundle agent main
 {
     files:
         "/tmp/myfile.txt" -> "hei"
-            create => "true";
+            create => "true",
+            comment => "comment";
 }

@@ -40,7 +40,10 @@ class CFBundleStatement(CFSyntax):
         assert isinstance(promiseguard, CFPromiseGuard)
         promiseguard.pretty_print(pp)
 
-        if isinstance(self.peek(), CFComment) and self.peek().row() == promiseguard.row():
+        if (
+            isinstance(self.peek(), CFComment)
+            and self.peek().row() == promiseguard.row()
+        ):
             pp.print("  ")
             self.pop().pretty_print(pp)
 
