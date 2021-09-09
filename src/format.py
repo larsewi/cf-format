@@ -32,7 +32,17 @@ def f_policy(tokens, pretty):
 def f_bundle_block(tokens, pretty):
     stash = []
 
+    # pretty print bundle
     pretty.print(tokens.pop(0).value)
+
+    # pretty print macros, stash comments
+    while tokens and tokens[0].type in ("COMMENT", "MACRO"):
+        if tokens[0].type == "COMMENT":
+            stash.append(tokens.pop[0])
+        else:
+            pretty.println()
+            pretty.print_no_indent(tokens[0].value)
+            pretty.println()
 
 
 def f_body_block(tokens, pretty):
