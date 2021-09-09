@@ -1,27 +1,39 @@
 import argparse
-import sys
-from cf_policy import CFPolicy
-from lexer import Lexer
-from pretty_printer import PrettyPrinter
-
+from sys import stderr
+from lex import IllegalTokenException, Lex
+from format import format, SyntaxErrorException
 
 def main():
     config = parse_arguments()
+    lexer = Lex()
 
     for filename in config.file:
-        lexer = Lexer(filename, config.debug == "lexer")
-        tokens = lexer.tokenize()
-        policy = CFPolicy.parse(tokens, config.debug == "parser")
+        with open(filename, 'r') as f:
+            in_data = f.read()
 
-        pp = PrettyPrinter(config.debug == "printer")
-        policy.pretty_print(pp)
+        lexer.input(in_data)
 
-        if config.debug == "printer":
-            print("*************************")
-            output = pp.__str__().replace(" ", "·")
-            print(output)
+        try:
+            tokens = [tok for tok in lexer if tok.type not in ("NEWLINE", "INDENT")]
+        except IllegalTokenException as e:
+            print("There are syntax errors in policy file '%s'" % filename, file=stderr)
+            print(e, file=stderr)
+            continue
 
-        # TODO: Write result to output file
+        for token in tokens:
+            print("DEBUG:", token)
+
+        out_data = ""
+        try:
+            out_data = format(tokens)
+        except SyntaxErrorException as e:
+            print("There are syntax errors in policy file '%s'" % filename, file=stderr)
+            print(e, file=stderr)
+            #continue
+
+        print("DEBUG:", "'%s'" % out_data)
+
+
 
 
 def parse_arguments():

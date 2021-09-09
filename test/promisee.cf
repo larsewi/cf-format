@@ -1,4 +1,5 @@
-bundle agent main
+# Hello
+bundle agent main()
 {
     files:
         "/tmp/myfile.txt" -> "hei"

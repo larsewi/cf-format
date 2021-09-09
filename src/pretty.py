@@ -1,11 +1,10 @@
 import os
 
 
-class PrettyPrinter:
+class Pretty:
     _MAX_COL = 80
 
-    def __init__(self, debug):
-        self._debug = debug
+    def __init__(self):
         self._indent = ""
         self._strlst = [""]
 
@@ -17,8 +16,6 @@ class PrettyPrinter:
         if s:
             self._strlst[-1] += s
 
-        self._log_debug()
-
     def println(self, s=""):
         assert "\n" not in s
 
@@ -26,15 +23,11 @@ class PrettyPrinter:
             self._strlst[-1] += s
         self._strlst.append("")
 
-        self._log_debug()
-
     def print_no_indent(self, s=""):
         assert "\n" not in s
 
         if s:
             self._strlst[-1] += s
-
-        self._log_debug()
 
     def get_cursor(self):
         row = len(self._strlst)
@@ -46,12 +39,8 @@ class PrettyPrinter:
         self._strlst = self._strlst[:row]
         self._strlst[-1] = self._strlst[-1][:col]
 
-        self._log_debug()
-
     def align(self, spaces):
         self._strlst[-1] += " " * spaces
-
-        self._log_debug()
 
     def indent(self):
         assert len(self._indent) % 2 == 0
@@ -68,7 +57,3 @@ class PrettyPrinter:
 
     def __str__(self):
         return "\n".join(self._strlst)
-
-    def _log_debug(self):
-        if self._debug:
-            print(self._strlst[-1].replace(" ", "·"))
