@@ -116,29 +116,135 @@ class Format:
         pass
 
     def f_arglist(self):
+        stash = []
+
         # print left parenthesis
         token = self.pop("LEFT_PARENTHESIS")
         self.pretty.print(token.value)
 
-        if not self.f_arglist_no_wrap():
-            if not self.f_arglist_single_wrap():
-                self.f_arglist_full_wrap()
+        if not self.f_arglist_no_wrap(stash):
+            if not self.f_arglist_single_wrap(stash):
+                self.f_arglist_full_wrap(stash)
 
         # print right parenthesis
         token = self.pop("RIGHT_PARENTHESIS")
         self.pretty.print(token.value)
 
-    def f_arglist_no_wrap(self):
+    def f_arglist_no_wrap(self, stash):
         rev_tok = 0
         rev_cur = self.pretty.get_cursor()
+        tmp_stash = []
 
-    def f_arglist_single_wrap(self):
-        rev_tok = 0
-        rev_cur = self.pretty.get_cursor()
+        last = None
+        while self.peek().type != "RIGHT_PARENTHESIS":
+            # stash comment
+            if self.peek().type == "COMMENT":
+                stash.append(self.pop())
+                rev_tok += 1
+            # print identifier
+            elif not last or last.type == "COMMA":
+                # print space in front of identifier
+                if last:
+                    self.pretty.print(" ")
+                token = self.pop("IDENTIFIER", "COMMENT", "MACRO")
+                rev_tok += 1
+                self.pretty.print(token.value)
+                last = token
+            # print comma
+            elif last and last.type == "IDENTIFIER":
+                token = self.pop("COMMA", "COMMENT", "MACRO")
+                rev_tok += 1
+                self.pretty.print(token.value)
+                last = token
+            else:
+                msg = "Expected identifier, comment, macro; found %s" % self.peek().__str__()
+                raise CFSyntaxException(msg)
 
-    def f_arglist_full_wrap(self):
+            # no wrap failed, revert back and return failure
+            if self.pretty.should_wrap(1) or self.peek() == "MACRO":
+                self.pretty.truncate_to(rev_cur)
+                self.push_back(rev_tok)
+                return False
+
+        # TODO - if last is comma, remove it
+
+        stash.extend(tmp_stash)
+        return True
+
+    def f_arglist_single_wrap(self, stash):
         rev_tok = 0
         rev_cur = self.pretty.get_cursor()
+        tmp_stash = []
+
+        self.pretty.indent()
+        self.pretty.println()
+
+        last = None
+        while self.peek().type != "RIGHT_PARENTHESIS":
+            # stash comment
+            if self.peek().type == "COMMENT":
+                stash.append(self.pop())
+                rev_tok += 1
+            # print identifier
+            elif not last or last.type == "COMMA":
+                # print space in front of identifier
+                if last:
+                    self.pretty.print(" ")
+                token = self.pop("IDENTIFIER", "COMMENT", "MACRO")
+                rev_tok += 1
+                self.pretty.print(token.value)
+                last = token
+            # print comma
+            elif last and last.type == "IDENTIFIER":
+                token = self.pop("COMMA", "COMMENT", "MACRO")
+                rev_tok += 1
+                self.pretty.print(token.value)
+                last = token
+            else:
+                msg = "Expected identifier, comment, macro; found %s" % self.peek().__str__()
+                raise CFSyntaxException(msg)
+
+            # no wrap failed, revert back and return failure
+            if self.pretty.should_wrap(1) or self.peek() == "MACRO":
+                self.pretty.truncate_to(rev_cur)
+                self.push_back(rev_tok)
+                return False
+        
+        # TODO - if last is comma, remove it
+
+        self.pretty.println()
+        self.pretty.dedent()
+
+        stash.extend(tmp_stash)
+        return True
+
+    def f_arglist_full_wrap(self, stash):
+        local_stash = []
+
+        self.pretty.indent()
+        self.pretty.println()
+
+        last = None
+        while self.peek().type != "RIGHT_PARENTHESIS":
+            if self.peek().type == "COMMENT":
+                if last and last.type == "COMMA":
+                    self.pretty.print("  ")
+                    self.pretty.print(self.pop().value)
+                else:
+                    local_stash.append(self.pop())
+            elif self.peek().type == "MACRO":
+                self.pretty.println()
+                self.pretty.print_no_indent(self.pop().value)
+                self.pretty.println()
+            elif not last and last.type == "COMMA":
+                pass # identifier
+            elif last and last.type == "IDENTIFIER":
+                pass # comma
+
+        # TODO -  add comma if not comma last
+
+        self.pretty.println()
+        self.pretty.dedent()
 
     def f_print_macros_stash_comments(self, stash):
         macro_found = False

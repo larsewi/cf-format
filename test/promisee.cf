@@ -3,7 +3,7 @@
 
 # Bye
 # You
-bundle agent main()
+bundle agent main(super_duper_long_arg_a, super_duper_long_arg_b, super_duper_long_arg_c)
 {
     files:
         "/tmp/myfile.txt" -> "hei"
