@@ -1,5 +1,5 @@
 import re
-import sys
+from exceptions import CFSyntaxException
 
 tokens = (
     ("INDENT", re.compile(r"[ \t]+")),
@@ -19,8 +19,8 @@ tokens = (
     ("CLASS_GUARD", re.compile(r"((\"[^\"\0]*\"|\'[^'\0]*\')|(\"[^\"\0]*\"|\'[^'\0]*\'))::")),
     ("PROMISE_GUARD", re.compile(r"[a-zA-Z_]+:")),
 
-    ("LEFT_PAREN", re.compile(r"\(")),
-    ("RIGHT_PAREN", re.compile(r"\)")),
+    ("LEFT_PARENTHESIS", re.compile(r"\(")),
+    ("RIGHT_PARENTHESIS", re.compile(r"\)")),
     ("LEFT_BRACE", re.compile(r"\{")),
     ("RIGHT_BRACE", re.compile(r"\}")),
     ("COMMA", re.compile(r"\,")),
@@ -30,10 +30,6 @@ tokens = (
 )
 
 
-class IllegalTokenException(Exception):
-    pass
-
-
 class LexToken:
     def __init__(self, type, value, lineno, column):
         self.type = type
@@ -41,8 +37,11 @@ class LexToken:
         self.lineno = lineno
         self.column = column
 
-    def __str__(self):
+    def __repr__(self):
         return "(%s,'%s',%d,%d)" % (self.type, self.value, self.lineno, self.column)
+
+    def __str__(self):
+        return "%s" % self.type.lower().replace("_", " ")
 
 class Lex():
     def __init__(self):
@@ -75,9 +74,8 @@ class Lex():
                     return tok
 
         if self.lexpos != self.lexlen:
-            msg = "%s\n" % self.lexdata.splitlines()[self.lineno - 1]
-            msg += "%s^ Illegal token [%d,%d]" % (" " * (self.column - 1), self.lineno, self.column)
-            raise IllegalTokenException(msg)
+            msg = "Illegal token [%d,%d]" % (self.lineno, self.column)
+            raise CFSyntaxException(msg)
         return None
 
     def __iter__(self):

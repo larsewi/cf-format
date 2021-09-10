@@ -1,37 +1,36 @@
+from exceptions import CFSyntaxException
 import argparse
 from sys import stderr
-from lex import IllegalTokenException, Lex
-from format import format, SyntaxErrorException
+from lex import Lex
+from format import Format
 
 def main():
     config = parse_arguments()
     lexer = Lex()
+    format = Format()
 
     for filename in config.file:
         with open(filename, 'r') as f:
-            in_data = f.read()
+            data = f.read()
 
-        lexer.input(in_data)
+        lexer.input(data)
 
         try:
             tokens = [tok for tok in lexer if tok.type not in ("NEWLINE", "INDENT")]
-        except IllegalTokenException as e:
-            print("There are syntax errors in policy file '%s'" % filename, file=stderr)
-            print(e, file=stderr)
+        except CFSyntaxException as e:
+            print("There are syntax errors in policy file '%s': %s" % (filename, e), file=stderr)
             continue
 
         for token in tokens:
-            print("DEBUG:", token)
+            print("DEBUG:", token.__repr__())
 
-        out_data = ""
         try:
-            out_data = format(tokens)
-        except SyntaxErrorException as e:
-            print("There are syntax errors in policy file '%s'" % filename, file=stderr)
-            print(e, file=stderr)
+            format.input(tokens)
+        except CFSyntaxException as e:
+            print("There are syntax errors in policy file '%s': %s" % (filename, e), file=stderr)
             #continue
 
-        print("DEBUG:", "'%s'" % out_data)
+        print("DEBUG:", "'%s'" % format)
 
 
 
